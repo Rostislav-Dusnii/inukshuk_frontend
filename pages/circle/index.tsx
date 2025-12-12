@@ -1,5 +1,6 @@
 "use client";
 
+
 import MapClickHandler from "@components/map/MapClickHandler";
 import MapContainerComponent, { MapContainerRef } from "@components/map/MapContainerComponent";
 import MapToolBarNavComponent from "@components/map/MapToolBarNavComponent";
@@ -19,7 +20,7 @@ import SaveServiceManager from "@util/save";
 import Header from "@components/header";
 import { compareShapesForIntersections } from "@util/polygonCalculations";
 import { saveMapData as saveMapDataUtil, loadMapData as loadMapDataUtil } from "@services/MapPersistenceService";
-import { updateCircleInside as updateCircleInsideHelper, toggleCircleVisibility as toggleCircleVisibilityHelper, zoomToShape } from "@util/circleHelpers";
+import { updateCircleInside as updateCircleInsideHelper, toggleCircleVisibility as toggleCircleVisibilityHelper, zoomToShape, calculateZoomForRadius } from "@util/circleHelpers";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LeafletMap = any;
@@ -297,9 +298,10 @@ export default function LeafletMap() {
       setLongitude(lngToUse);
     }
 
-    // Recenter map to the used location, preserving current zoom
-    const currentZoom = leafletMap.getZoom();
-    leafletMap.setView({ lng: lngToUse, lat: latToUse }, currentZoom);
+    // Calculate optimal zoom level based on circle radius to show the circle properly
+    const optimalZoom = calculateZoomForRadius(radius);
+    // Center map on the circle location with the calculated zoom
+    leafletMap.setView([latToUse, lngToUse], optimalZoom);
 
     const id = nextId + 1;
 
@@ -538,3 +540,14 @@ export default function LeafletMap() {
     </>
   );
 }
+
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetStaticProps } from "next";
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+        },
+    };
+};

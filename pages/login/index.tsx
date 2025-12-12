@@ -2,12 +2,17 @@ import LoginForm from "@components/auth/LoginForm"
 import Header from "@components/header"
 import Head from "next/head"
 import Link from "next/link"
+import { useTranslation } from "next-i18next"
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"
+import { GetStaticProps } from "next"
 
 const Login: React.FC = () => {
+    const { t } = useTranslation("common")
+    
     return (
         <>
             <Head>
-                <title>Login</title>
+                <title>{t("nav.login")}</title>
             </Head>
 
             <Header />
@@ -18,9 +23,9 @@ const Login: React.FC = () => {
                         <LoginForm />
                     </section>
                     <p className="mt-6 text-sm text-gray-600 dark:text-gray-400">
-                        Not a user yet? {' '}
+                        {t("auth.login.no_account")} {' '}
                         <Link href='/register' className="text-brand-green hover:text-brand-green-dark font-semibold transition-colors">
-                            Register here
+                            {t("auth.login.register_link")}
                         </Link>
                     </p>
                 </main>
@@ -28,5 +33,13 @@ const Login: React.FC = () => {
         </>
     )
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+        },
+    };
+};
 
 export default Login

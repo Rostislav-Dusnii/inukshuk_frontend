@@ -5,9 +5,12 @@ import { User } from "@types";
 import Link from "next/link";
 import HeaderNotification from "./HeaderNotification";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { Menu } from "lucide-react";
+import { useTranslation } from "next-i18next";
 
 const Header: React.FC = () => {
+  const { t } = useTranslation("common");
   const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -63,12 +66,13 @@ const Header: React.FC = () => {
               <div className="absolute inset-0 bg-brand-orange/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
             </div>
             <span className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-white">
-              Treasure Hunt
+              {t("app.name")}
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <ThemeToggle />
 
             {!loggedInUser ? (
@@ -76,12 +80,12 @@ const Header: React.FC = () => {
                 href="/login"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg bg-brand-orange text-white hover:bg-brand-orange-dark active:scale-95 transition-all shadow-sm hover:shadow-md"
               >
-                Login
+                {t("nav.login")}
               </Link>
             ) : (
               <>
                 <div className="text-gray-700 dark:text-gray-300 font-medium ms-3 hidden lg:block">
-                  <span className="text-brand-orange">Welcome,</span>{" "}
+                  <span className="text-brand-orange">{t("nav.welcome")}</span>{" "}
                   {loggedInUser.username}!
                 </div>
                 <Link
@@ -89,7 +93,7 @@ const Header: React.FC = () => {
                   onClick={handleLogout}
                   className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  Logout
+                  {t("nav.logout")}
                 </Link>
               </>
             )}
@@ -101,7 +105,7 @@ const Header: React.FC = () => {
                 href="/friends"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white active:scale-95 transition-all ml-1"
               >
-                Friends
+                {t("nav.friends")}
               </Link>
             )}
 
@@ -109,7 +113,7 @@ const Header: React.FC = () => {
               href={loggedInUser ? "/circle" : "/login"}
               className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-green text-brand-green hover:bg-brand-green hover:text-white active:scale-95 transition-all ml-1"
             >
-              Map
+              {t("nav.map")}
             </Link>
 
             {loggedInUser && loggedInUser.role?.toUpperCase() === "ADMIN" && (
@@ -117,13 +121,14 @@ const Header: React.FC = () => {
                 href="/admin"
                 className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white active:scale-95 transition-all ml-1"
               >
-                Admin
+                {t("nav.admin")}
               </Link>
             )}
           </nav>
 
           {/* Mobile Navigation */}
           <div className="flex md:hidden items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             {loggedInUser && <HeaderNotification />}
 
@@ -149,12 +154,12 @@ const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-brand-orange text-white hover:bg-brand-orange-dark active:scale-95 transition-all shadow-sm"
                 >
-                  Login
+                  {t("nav.login")}
                 </Link>
               ) : (
                 <>
                   <div className="text-gray-700 dark:text-gray-300 font-medium px-4 py-2 text-center">
-                    <span className="text-brand-orange">Welcome,</span>{" "}
+                    <span className="text-brand-orange">{t("nav.welcome")}</span>{" "}
                     {loggedInUser.username}!
                   </div>
 
@@ -163,7 +168,7 @@ const Header: React.FC = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white active:scale-95 transition-all"
                   >
-                    Friends
+                    {t("nav.friends")}
                   </Link>
 
                   <Link
@@ -171,7 +176,7 @@ const Header: React.FC = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-green text-brand-green hover:bg-brand-green hover:text-white active:scale-95 transition-all"
                   >
-                    Map
+                    {t("nav.map")}
                   </Link>
 
                   <Link
@@ -179,7 +184,7 @@ const Header: React.FC = () => {
                     onClick={handleLogout}
                     className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   >
-                    Logout
+                    {t("nav.logout")}
                   </Link>
                 </>
               )}
@@ -190,7 +195,7 @@ const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-green text-brand-green hover:bg-brand-green hover:text-white active:scale-95 transition-all"
                 >
-                  Map
+                  {t("nav.map")}
                 </Link>
               )}
             </nav>

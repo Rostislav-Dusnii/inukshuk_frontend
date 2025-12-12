@@ -4,6 +4,9 @@ import AuthService from '@services/AuthService';
 import { StatusMessage } from '@types';
 import Link from 'next/link';
 import Header from '@components/header';
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetStaticProps } from "next";
 
 const ResetPassword: React.FC = () => {
     const [token, setToken] = useState<string>('');
@@ -227,3 +230,12 @@ const ResetPassword: React.FC = () => {
 };
 
 export default ResetPassword;
+
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+        },
+    };
+};

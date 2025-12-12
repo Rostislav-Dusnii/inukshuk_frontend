@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { useTranslation } from "next-i18next";
 
 interface CircleListPanelProps {
     circles: Array<{ id: number; inside: boolean; visible: boolean; shape: any }>;
-    intersections: Array<{ id: number; inside: boolean; visible: boolean; polygons: any[] }>;
+    intersections: Array<{ id: number; inside: boolean; visible: boolean; polygons: any[]; isHighlight?: boolean }>;
     selectedCircle: number | null;
     onSelectCircle: (id: number) => void;
     onToggleVisibility: (id: number) => void;
@@ -10,24 +11,28 @@ interface CircleListPanelProps {
 }
 
 export default function CircleListPanel({
-    circles,
-    intersections,
-    selectedCircle,
-    onSelectCircle,
-    onToggleVisibility,
-    onZoomToShape,
+  circles,
+  intersections,
+  selectedCircle,
+  onSelectCircle,
+  onToggleVisibility,
+  onZoomToShape,
 }: CircleListPanelProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     // Combine circles and intersections for display
+    // Mark intersection highlights with a special type
     const allShapes = [
-        ...circles.map((c) => ({ ...c, type: "circle" })),
-        ...intersections.map((i) => ({ ...i, type: "polygon" })),
+        ...circles.map((c) => ({ ...c, type: "circle" as const })),
+        ...intersections.map((i) => ({ 
+            ...i, 
+            type: i.isHighlight ? "intersection" as const : "polygon" as const 
+        })),
     ].sort((a, b) => a.id - b.id);
 
-    if (allShapes.length === 0) {
-        return null;
-    }
+  if (allShapes.length === 0) {
+    return null;
+  }
 
     return (
         <>
@@ -35,7 +40,7 @@ export default function CircleListPanel({
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="fixed z-[1000] top-[160px] left-4 w-12 h-12 flex items-center justify-center rounded-lg border-2 border-brand-green bg-white dark:bg-gray-800 shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105"
-                title="Toggle circles list"
+                title="Toggle elements list"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -58,19 +63,19 @@ export default function CircleListPanel({
                 )}
             </button>
 
-            {/* Panel */}
-            {isOpen && (
-                <>
-                    {/* Backdrop for mobile */}
-                    <div
-                        className="fixed inset-0 bg-black bg-opacity-30 z-[1000] md:hidden"
-                        onClick={() => setIsOpen(false)}
-                    />
+      {/* Panel */}
+      {isOpen && (
+        <>
+          {/* Backdrop for mobile */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30 z-[1000] md:hidden"
+            onClick={() => setIsOpen(false)}
+          />
 
                     <div className="fixed z-[1001] top-[200px] left-4 md:left-20 right-4 md:right-auto border-solid rounded-lg border-brand-green border-2 bg-white dark:bg-gray-800 shadow-2xl p-3 max-h-[60vh] md:max-h-[400px] overflow-y-auto min-w-0 md:min-w-[250px] max-w-[calc(100vw-2rem)] md:max-w-sm animate-slideIn">
                         <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-300 dark:border-gray-600">
                             <h3 className="font-bold text-brand-green dark:text-brand-green-light text-base flex items-center gap-2">
-                                <span>Circles</span>
+                                <span>Elements</span>
                                 <span className="text-xs font-semibold bg-brand-green dark:bg-brand-green-light text-white dark:text-gray-900 px-2 py-0.5 rounded-full">
                                     {allShapes.length}
                                 </span>
@@ -109,19 +114,22 @@ export default function CircleListPanel({
                                         className="flex-1 text-left flex items-center gap-2 min-w-0 bg-transparent border-0 shadow-none p-2 m-0 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors rounded-l-lg"
                                     >
                                         <span className="text-2xl flex-shrink-0">
-                                            {shape.type === "circle" ? "⭕" : "⬟"}
+                                            {shape.type === "circle" ? "⭕" : shape.type === "intersection" ? "🟢" : "⬟"}
                                         </span>
                                         <div className="flex flex-col gap-1 flex-1 min-w-0">
                                             <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                {shape.type === "circle" ? "Circle" : "Polygon"} #{shape.id}
+                                                {shape.type === "circle" ? "Circle" : shape.type === "intersection" ? "Search Area" : "Polygon"} #{shape.id}
                                             </span>
                                             <span
-                                                className={`text-xs font-medium px-2 py-0.5 rounded-full w-fit ${shape.inside
+                                                className={`text-xs font-medium px-2 py-0.5 rounded-full w-fit ${
+                                                    shape.type === "intersection"
+                                                    ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200"
+                                                    : shape.inside
                                                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
                                                     : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
                                                     }`}
                                             >
-                                                {shape.inside ? "Inside" : "Outside"}
+                                                {shape.type === "intersection" ? "Highlighted" : shape.inside ? "Inside" : "Outside"}
                                             </span>
                                         </div>
                                     </button>

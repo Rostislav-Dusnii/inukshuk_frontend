@@ -1,5 +1,6 @@
 import { PartyPopper } from 'lucide-react';
 
+
 type Props = {
     setModalOpen: (bool: boolean) => void;
 }
@@ -17,3 +18,7 @@ const RewardsIconComponent: React.FC<Props> = ({ setModalOpen }: Props) => {
 }
 
 export default RewardsIconComponent
+
+
+
+

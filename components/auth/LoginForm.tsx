@@ -4,8 +4,10 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import Link from "next/link";
+import { useTranslation } from "next-i18next";
 
 const LoginForm: React.FC = () => {
+  const { t } = useTranslation("common");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
@@ -19,7 +21,7 @@ const LoginForm: React.FC = () => {
     if (!executeRecaptcha) {
       setStatusMessages([
         {
-          message: "reCAPTCHA not loaded. Please refresh the page.",
+          message: t("auth.login.error_recaptcha"),
           type: "error",
         },
       ]);
@@ -44,7 +46,7 @@ const LoginForm: React.FC = () => {
       if (response.status === 200) {
         setStatusMessages([
           {
-            message: "Login successful. Redirecting to homepage...",
+            message: t("auth.login.success"),
             type: "success",
           },
         ]);
@@ -70,13 +72,13 @@ const LoginForm: React.FC = () => {
               message:
                 errorData.errorMessage ||
                 errorData.message ||
-                "Invalid credentials",
+                t("auth.login.error_invalid"),
               type: "error",
             },
           ]);
         } catch {
           setStatusMessages([
-            { message: "Invalid username or password", type: "error" },
+            { message: t("auth.login.error_invalid"), type: "error" },
           ]);
         }
       } else if (response.status === 400) {
@@ -85,13 +87,13 @@ const LoginForm: React.FC = () => {
           setStatusMessages([
             {
               message:
-                errorData.errorMessage || errorData.message || "Bad request",
+                errorData.errorMessage || errorData.message || t("errors.generic"),
               type: "error",
             },
           ]);
         } catch {
           setStatusMessages([
-            { message: "Request failed. Please try again.", type: "error" },
+            { message: t("errors.generic"), type: "error" },
           ]);
         }
       } else {
@@ -102,14 +104,14 @@ const LoginForm: React.FC = () => {
               message:
                 errorData.errorMessage ||
                 errorData.message ||
-                "An error occurred",
+                t("errors.generic"),
               type: "error",
             },
           ]);
         } catch {
           setStatusMessages([
             {
-              message: "An error has occurred. Please try again later.",
+              message: t("auth.login.error_generic"),
               type: "error",
             },
           ]);
@@ -118,8 +120,7 @@ const LoginForm: React.FC = () => {
     } catch {
       setStatusMessages([
         {
-          message:
-            "Unable to connect to server. Please check if the backend is running.",
+          message: t("auth.login.error_connection"),
           type: "error",
         },
       ]);
@@ -132,10 +133,10 @@ const LoginForm: React.FC = () => {
     <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl w-full max-w-md shadow-lg border border-gray-200 dark:border-gray-800 transition-colors">
       <form onSubmit={handleSubmit}>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Welcome <span className="text-brand-orange">back</span>
+          {t("auth.login.title")} <span className="text-brand-orange">{t("auth.login.title_highlight")}</span>
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
-          Enter your credentials to access your account
+          {t("auth.login.subtitle")}
         </p>
 
         {statusMessages.map((msg, idx) => (
@@ -156,14 +157,14 @@ const LoginForm: React.FC = () => {
             htmlFor="username"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
           >
-            Username
+            {t("auth.login.username")}
           </label>
           <input
             id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            placeholder={t("auth.login.username_placeholder")}
             className="block w-full rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all"
           />
         </div>
@@ -173,13 +174,13 @@ const LoginForm: React.FC = () => {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300"
             >
-              Password
+              {t("auth.login.password")}
             </label>
             <Link
               href="/forgot-password"
               className="text-xs text-brand-orange hover:text-brand-orange-dark font-medium transition-colors"
             >
-              Forgot password?
+              {t("auth.login.forgot_password")}
             </Link>
           </div>
           <input
@@ -187,7 +188,7 @@ const LoginForm: React.FC = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter your password"
+            placeholder={t("auth.login.password_placeholder")}
             className="block w-full rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all"
           />
         </div>
@@ -197,7 +198,7 @@ const LoginForm: React.FC = () => {
             disabled={isSubmitting}
             className="w-full rounded-lg bg-brand-orange px-4 py-3 text-sm font-semibold text-white hover:bg-brand-orange-dark active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-orange"
           >
-            {isSubmitting ? "Verifying..." : "Login"}
+            {isSubmitting ? t("auth.login.logging_in") : t("auth.login.submit")}
           </button>
         </div>
         {executeRecaptcha && (

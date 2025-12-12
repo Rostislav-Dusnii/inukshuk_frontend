@@ -3,6 +3,7 @@
 import { UserFormatFriendRequest } from "@types";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   searchFunction: (query: string) => Promise<UserFormatFriendRequest[]>;
@@ -26,6 +27,7 @@ const SearchFriends: React.FC<Props> = ({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<UserFormatFriendRequest[]>([]);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     const handler = setTimeout(async () => {
@@ -76,7 +78,7 @@ const SearchFriends: React.FC<Props> = ({
       <div className="relative">
         <input
           type="text"
-          placeholder="Search users..."
+          placeholder={t("friends.search")}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full h-10 rounded-md bg-white dark:bg-gray-800 
@@ -112,13 +114,17 @@ const SearchFriends: React.FC<Props> = ({
               className="mb-3 opacity-70"
               priority
             />
-            <p className="text-sm text-brand-orange-lighter">Type to search…</p>
+            <p className="text-sm text-brand-orange-lighter">
+              {t("friends.type_to_search")}
+            </p>
           </div>
         )}
 
         {showLoading && (
           <div className="flex h-[200px] items-center justify-center">
-            <p className="text-sm text-brand-orange-lighter">Loading…</p>
+            <p className="text-sm text-brand-orange-lighter">
+              {t("common.loading")}
+            </p>
           </div>
         )}
 
@@ -132,7 +138,9 @@ const SearchFriends: React.FC<Props> = ({
               className="mb-3 opacity-70"
               priority
             />
-            <p className="text-sm text-brand-orange-lighter">No users found</p>
+            <p className="text-sm text-brand-orange-lighter">
+              {t("friends.none_found")}
+            </p>
           </div>
         )}
 
@@ -165,30 +173,30 @@ const SearchFriends: React.FC<Props> = ({
                                  hover:bg-brand-orange-darker transition"
                       onClick={() => handleSendRequest(user.id!)}
                     >
-                      Send Request
+                      {t("friends.send_request")}
                     </button>
                   )}
 
                   {status === "PENDING" && (
                     <span className="text-brand-orange font-semibold">
-                      Pending
+                      {t("friends.pending")}
                     </span>
                   )}
 
                   {status === "FRIEND" && (
                     <span className="text-brand-green font-semibold">
-                      Friend
+                      {t("friends.removed").split(" ")[0]}
                     </span>
                   )}
 
                   {status === "INCOMING" && (
                     <span className="text-brand-green-darker font-semibold">
-                      Incoming
+                      {t("friends.incoming")}
                     </span>
                   )}
 
                   {status === "REJECTED" && (
-                    <span className="text-red-500 font-semibold">Rejected</span>
+                    <span className="text-red-500 font-semibold">{t("friends.rejected")}</span>
                   )}
                 </li>
               );

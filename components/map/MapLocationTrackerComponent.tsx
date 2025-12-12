@@ -1,6 +1,8 @@
 import { MapPin } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from "next-i18next";
+
 
 type Props = {
     map: any;
@@ -30,6 +32,7 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
     const userAccuracyRef = useRef<any>(null);
     const permissionRequestedRef = useRef(false);
     const lastAccuracyRef = useRef<number>(0);
+    const { t } = useTranslation("common");
 
     // Request location permission on mount
     useEffect(() => {
@@ -40,7 +43,7 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
         setPermissionRequested(true);
 
         if (!navigator.geolocation) {
-            setLocationWarning("Geolocation is not supported by your browser.");
+            setLocationWarning(t("map.location.support_disabled"));
             return;
         }
 
@@ -64,11 +67,11 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
         if (err.code === err.PERMISSION_DENIED) {
             setPermissionDenied(true);
         } else if (err.code === err.POSITION_UNAVAILABLE) {
-            setLocationWarning("GPS position unavailable. Try turning on location services or moving to a location with better signal.");
+            setLocationWarning(t("map.location.unavailable"));
         } else if (err.code === err.TIMEOUT) {
-            setLocationWarning("Location request timed out. Please try again.");
+            setLocationWarning(t("map.location.timeout"));
         } else {
-            setLocationWarning("Unable to get your location. Please try again.");
+            setLocationWarning(t("map.location.unable"));
         }
     };
 
@@ -109,7 +112,7 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
 
     const toggleTracking = () => {
         if (!navigator.geolocation) {
-            setLocationWarning("Geolocation is not supported by your browser.");
+            setLocationWarning(t("map.location.support_disabled"));
             return;
         }
 
@@ -126,7 +129,7 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
 
                 if (accuracy && accuracy > 100) {
                     setLocationWarning(
-                        `GPS accuracy is low (${Math.round(accuracy)}m). Results may be inaccurate.`
+                        `${t("map.location.low_accuracy1")}${Math.round(accuracy)}${t("map.location.low_accuracy2")}`
                     );
                 } else {
                     setLocationWarning(null);
@@ -199,12 +202,12 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
                     <div className="bg-gradient-to-br from-brand-orange to-brand-orange-dark py-5 px-6 flex justify-between items-center">
                         <div className="flex items-center gap-3">
                             <MapPin />
-                            <h3 className="m-0 text-lg font-bold text-white tracking-wide">Location Tracker</h3>
+                            <h3 className="m-0 text-lg font-bold text-white tracking-wide">{t("map.locationTracker")}</h3>
                         </div>
                         <button
                             onClick={onToggle}
                             className="bg-white/15 border border-white/30 text-white w-8 h-8 rounded-lg flex items-center justify-center text-lg leading-none cursor-pointer transition-all duration-200 p-0 m-0 hover:bg-white/25 hover:border-white/50"
-                            aria-label="Close location tracker"
+                            aria-label={t("map.close_tracker")}
                         >
                             ✕
                         </button>
@@ -212,7 +215,7 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
                     <div className="p-6">
                         <div className="flex flex-col gap-3">
                             <button onClick={toggleTracking} className="bg-gradient-to-br from-brand-orange to-brand-orange-dark border-none text-white py-3 px-5 rounded-xl font-semibold text-sm cursor-pointer transition-all duration-200 shadow-[0_2px_8px_rgba(237,118,14,0.2)] w-full hover:-translate-y-px hover:shadow-[0_4px_16px_rgba(237,118,14,0.3)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(237,118,14,0.2)]">
-                                📌 My Location
+                                📌 {t("map.location.myLocation")}
                             </button>
                             <button
                                 onClick={toggleMarkerVisibility}
@@ -221,13 +224,13 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
                                     : "bg-gradient-to-br from-gray-600 to-gray-700 border-none text-white py-3 px-5 rounded-xl font-semibold text-sm cursor-pointer transition-all duration-200 shadow-[0_2px_8px_rgba(108,117,125,0.2)] w-full hover:from-gray-700 hover:to-gray-800 hover:-translate-y-px hover:shadow-[0_4px_16px_rgba(108,117,125,0.3)] active:translate-y-0 active:shadow-[0_2px_8px_rgba(108,117,125,0.2)]"
                                 }
                             >
-                                {showLocationMarker ? "👁️ Hide Marker" : "👁️‍🗨️ Show Marker"}
+                                {showLocationMarker ? `👁️ ${t("map.marker.hide")}` : `👁️‍🗨️ ${t("map.marker.show")}`}
                             </button>
                         </div>
                         {permissionDenied && (
                             <div className="bg-red-50 dark:bg-red-900/20 border-l-[3px] border-red-500 py-3 px-3.5 rounded-lg mt-3 flex items-start gap-2.5 animate-fadeIn">
                                 <span className="text-base leading-none flex-shrink-0">🚫</span>
-                                <p className="m-0 text-red-500 dark:text-red-300 text-xs leading-relaxed font-medium">Location access denied. Please enable it in settings to use this feature.</p>
+                                <p className="m-0 text-red-500 dark:text-red-300 text-xs leading-relaxed font-medium">{t("map.location.denied")}</p>
                             </div>
                         )}
                         {locationWarning && !permissionDenied && (
@@ -245,3 +248,6 @@ const MapLocationTrackerComponent: React.FC<Props> = ({
 };
 
 export default MapLocationTrackerComponent;
+
+
+

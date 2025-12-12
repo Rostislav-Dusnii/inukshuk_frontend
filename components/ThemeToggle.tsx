@@ -2,9 +2,10 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
 
+
 const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-
+  //const { t } = useTranslation("common");
   return (
     <Link
       href="#"

@@ -1,5 +1,7 @@
 "use client";
-
+// import { useTranslation } from "next-i18next";
+// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+// import { GetStaticProps } from "next";
 import CircleCounterComponent from "@components/map/CircleCounterComponent";
 import Head from "next/head";
 import Header from "@components/header";
@@ -117,15 +119,86 @@ export default function SharedCirclesPage() {
             '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(leafletMap.current);
 
-        // Draw all circles
-        circles.forEach((circle, index) => {
+        // Separate inside and outside circles
+        const insideCircles = circles.filter(c => c.isInside);
+        const outsideCircles = circles.filter(c => !c.isInside);
+
+        // Draw all circles as grey first
+        circles.forEach((circle) => {
           L.circle([circle.latitude, circle.longitude], {
-            color: circle.isInside ? "green" : "darkgrey",
-            fillColor: circle.isInside ? "lightgreen" : "lightgrey",
+            color: "darkgrey",
+            fillColor: "lightgrey",
             fillOpacity: 0.4,
             radius: circle.radius,
           }).addTo(leafletMap.current);
         });
+
+        // Helper function to convert circle to polygon coordinates
+        const circleToPolygon = (lat: number, lng: number, radius: number, steps = 64) => {
+          const coords = [];
+          const latRad = (lat * Math.PI) / 180;
+          const metersPerDegreeLat = 111320;
+          const metersPerDegreeLng = 111320 * Math.cos(latRad);
+
+          for (let i = 0; i < steps; i++) {
+            const angle = (i / steps) * 2 * Math.PI;
+            coords.push([
+              lng + (radius / metersPerDegreeLng) * Math.cos(angle),
+              lat + (radius / metersPerDegreeLat) * Math.sin(angle),
+            ]);
+          }
+          coords.push(coords[0]);
+          return coords;
+        };
+
+        // Calculate and draw search area if there are inside circles
+        if (insideCircles.length > 0) {
+          // Dynamic import of polygon-clipping
+          const pc = await import("polygon-clipping");
+          
+          // Convert inside circles to polygons and find their intersection
+          const insidePolygons = insideCircles.map(c => 
+            circleToPolygon(c.latitude, c.longitude, c.radius)
+          );
+          
+          // Start with first inside circle
+          let searchArea: any = [[insidePolygons[0]]];
+          
+          // Intersect with other inside circles
+          for (let i = 1; i < insidePolygons.length; i++) {
+            searchArea = pc.default.intersection(searchArea, [[insidePolygons[i]]]);
+            if (searchArea.length === 0) break;
+          }
+          
+          // Subtract outside circles from search area
+          if (searchArea.length > 0) {
+            for (const outsideCircle of outsideCircles) {
+              const outsidePoly = circleToPolygon(
+                outsideCircle.latitude, 
+                outsideCircle.longitude, 
+                outsideCircle.radius
+              );
+              searchArea = pc.default.difference(searchArea, [[outsidePoly]]);
+              if (searchArea.length === 0) break;
+            }
+          }
+          
+          // Draw the search area as green if it exists
+          if (searchArea.length > 0) {
+            searchArea.forEach((multiPolygon: any) => {
+              const allRings = multiPolygon.map((ring: any) =>
+                ring.map(([lng, lat]: [number, number]) => [lat, lng])
+              );
+              
+              L.polygon(allRings, {
+                color: "#228B22",
+                fillColor: "#32CD32",
+                fillOpacity: 0.5,
+                weight: 3,
+              }).addTo(leafletMap.current);
+            });
+          }
+        }
       }
     };
 
@@ -466,3 +539,14 @@ export default function SharedCirclesPage() {
     </>
   );
 }
+
+
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetStaticProps } from "next";
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+    return {
+        props: {
+            ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+        },
+    };
+};

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import CircleService from "@services/CircleService";
 import { AcceptedCircleShareDTO } from "@types";
 import { Eye, EyeOff, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "next-i18next";
+
 
 type Props = {
   onToggleVisibility: (shareId: string, visible: boolean) => void;
@@ -19,6 +21,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
   const [error, setError] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [expandedShare, setExpandedShare] = useState<string | null>(null);
+const { t } = useTranslation("common");
 
   const loadAcceptedShares = async () => {
     try {
@@ -40,7 +43,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
       setAcceptedShares(shares);
       setIsLoading(false);
     } catch (err: any) {
-      setError(err.message || "Failed to load accepted circles");
+      setError(err.message || t("map.accepted_circle_fail"));
       setIsLoading(false);
     }
   };
@@ -72,7 +75,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
   };
 
   const handleRemove = async (shareId: string) => {
-    if (!confirm("Are you sure you want to remove these shared circles from your map?")) {
+    if (!confirm(t("map.shared_circle_confirm"))) {
       return;
     }
 
@@ -127,7 +130,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
           fontWeight: 600,
           fontSize: "0.95em"
         }}>
-          🔗 Shared Circles ({acceptedShares.length})
+          🔗 {t("map.shared_circles")} ({acceptedShares.length})
         </h3>
         {isExpanded ? (
           <ChevronDown className="text-gray-600 dark:text-gray-400" size={20} />
@@ -168,7 +171,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
                     fontSize: "0.9em",
                     margin: 0
                   }}>
-                    From: {share.ownerUsername}
+                    {t("map.accepted_from")} {share.ownerUsername}
                   </p>
                   <p className="text-gray-600 dark:text-gray-400" style={{ 
                     fontSize: "0.8em",
@@ -183,7 +186,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
                       e.stopPropagation();
                       handleToggleVisibility(share.shareId);
                     }}
-                    title={share.visible ? "Hide circles" : "Show circles"}
+                    title={share.visible ? t("map.circle_hide") : t("map.circle_show")}
                     style={{
                       padding: "4px",
                       background: "none",
@@ -206,7 +209,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
                       e.stopPropagation();
                       handleRemove(share.shareId);
                     }}
-                    title="Remove shared circles"
+                    title={t("map.shared_remove")}
                     style={{
                       padding: "4px",
                       background: "none",
@@ -240,7 +243,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
                   gap: "4px"
                 }}
               >
-                {expandedShare === share.shareId ? "Hide details" : "Show details"}
+                {expandedShare === share.shareId ? t("map.hide_details") : t("map.show_details") }
                 {expandedShare === share.shareId ? (
                   <ChevronUp size={14} />
                 ) : (
@@ -265,7 +268,7 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
                     >
                       <span style={{ fontWeight: 600 }}>#{index + 1}</span>
                       {" - "}
-                      <span>{circle.isInside ? "Inside" : "Outside"}</span>
+                      <span>{circle.isInside ? t("map.circleList.inside") : t("map.circleList.outside")}</span>
                       {" • "}
                       <span>{circle.radius}m</span>
                     </div>
@@ -281,3 +284,6 @@ const AcceptedCirclesPanel: React.FC<Props> = ({
 };
 
 export default AcceptedCirclesPanel;
+
+
+

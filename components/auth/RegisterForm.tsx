@@ -3,8 +3,10 @@ import { NewUser } from "@types"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useState } from "react"
+import { useTranslation } from "next-i18next"
 
 const RegisterForm: React.FC = () => {
+    const { t } = useTranslation("common")
     const [firstName, setFirstName] = useState<string>('')
     const [lastName, setLastName] = useState<string>('')
     const [username, setUsername] = useState<string>('')
@@ -19,7 +21,7 @@ const RegisterForm: React.FC = () => {
         e.preventDefault()
 
         if (!validateForm()) {
-            alert("Please fill in all fields correctly.")
+            alert(t("auth.register.error_fill_fields"))
             return
         }
 
@@ -54,19 +56,19 @@ const RegisterForm: React.FC = () => {
 
                 // Specific handling for invalid code
                 if (serverMsg === 'Invalid code') {
-                    setErrorMessage('The registration code is invalid. \nPlease check the code and try again.')
+                    setErrorMessage(t("auth.register.error_invalid_code"))
                     return
                 }
 
-                setErrorMessage(`Registration failed: ${serverMsg}`)
+                setErrorMessage(`${t("errors.generic")}: ${serverMsg}`)
                 return
             }
 
             // Other errors
-            setErrorMessage(`Registration failed: ${registrationResult.statusText} (${registrationResult.status}). \nPlease try again later.`)
+            setErrorMessage(`${t("errors.generic")}: ${registrationResult.statusText} (${registrationResult.status}).`)
         } catch (err) {
             console.error('Registration error:', err)
-            setErrorMessage('Registration failed. \nNetwork error or server unreachable.')
+            setErrorMessage(t("errors.network"))
         }
     }
 
@@ -92,13 +94,13 @@ const RegisterForm: React.FC = () => {
         <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl w-full max-w-md shadow-lg border border-gray-200 dark:border-gray-800 transition-colors">
             <form onSubmit={handleSubmit}>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                    Create <span className="text-brand-orange">Account</span>
+                    {t("auth.register.title")} <span className="text-brand-orange">{t("auth.register.title_highlight")}</span>
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">Join us to access all features</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{t("auth.register.subtitle")}</p>
                 {/* first name */}
                 <div className="mt-4">
                     <label htmlFor='firstName' className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        First name <span className="text-brand-orange">*</span>
+                        {t("auth.register.first_name")} <span className="text-brand-orange">{t("common.required")}</span>
                     </label>
                     <input 
                         id='firstName' 
@@ -106,18 +108,18 @@ const RegisterForm: React.FC = () => {
                         minLength={2} 
                         maxLength={24} 
                         pattern="[a-zA-Z]+" 
-                        placeholder="Enter your first name" 
+                        placeholder={t("auth.register.first_name_placeholder")} 
                         type="text" 
                         value={firstName} 
                         onChange={(e) => setFirstName(e.target.value)} 
                         className="block w-full rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all" 
                     />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Use 2–24 letters only.</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.register.first_name_hint")}</p>
                 </div>
                 {/* last name */}
                 <div className="mt-4">
                     <label htmlFor='lastName' className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Last name <span className="text-brand-orange">*</span>
+                        {t("auth.register.last_name")} <span className="text-brand-orange">{t("common.required")}</span>
                     </label>
                     <input 
                         id='lastName' 
@@ -125,18 +127,18 @@ const RegisterForm: React.FC = () => {
                         minLength={2} 
                         maxLength={24} 
                         pattern="[a-zA-Z]+" 
-                        placeholder="Enter your last name" 
+                        placeholder={t("auth.register.last_name_placeholder")} 
                         type="text" 
                         value={lastName} 
                         onChange={(e) => setLastName(e.target.value)} 
                         className="block w-full rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all" 
                     />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Use 2–24 letters only.</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.register.last_name_hint")}</p>
                 </div>
                 {/* username */}
                 <div className="mt-4">
                     <label htmlFor='username' className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Username <span className="text-brand-orange">*</span>
+                        {t("auth.register.username")} <span className="text-brand-orange">{t("common.required")}</span>
                     </label>
                     <input 
                         id='username' 
@@ -144,25 +146,25 @@ const RegisterForm: React.FC = () => {
                         minLength={2} 
                         maxLength={24} 
                         pattern="[a-zA-Z0-9-_]+" 
-                        placeholder="Enter your username" 
+                        placeholder={t("auth.register.username_placeholder")} 
                         type="text" 
                         value={username} 
                         onChange={(e) => setUsername(e.target.value)} 
                         className="block w-full rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all" 
                     />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">2–24 characters; letters, numbers, hyphens and underscores allowed.</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.register.username_hint")}</p>
                 </div>
                 {/* email */}
                 <div className="mt-4">
                     <label htmlFor='email' className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Email <span className="text-brand-orange">*</span>
+                        {t("auth.register.email")} <span className="text-brand-orange">{t("common.required")}</span>
                     </label>
                     <input 
                         id='email' 
                         required 
                         minLength={4} 
                         maxLength={100} 
-                        placeholder="Enter your email" 
+                        placeholder={t("auth.register.email_placeholder")} 
                         type="email" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)} 
@@ -172,32 +174,32 @@ const RegisterForm: React.FC = () => {
                 {/* password */}
                 <div className="mt-4">
                     <label htmlFor='password' className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Password <span className="text-brand-orange">*</span>
+                        {t("auth.register.password")} <span className="text-brand-orange">{t("common.required")}</span>
                     </label>
                     <input 
                         id='password' 
                         required 
                         minLength={8} 
                         maxLength={30} 
-                        placeholder="Enter your password" 
+                        placeholder={t("auth.register.password_placeholder")} 
                         type="password" 
                         value={password} 
                         onChange={(e) => setPassword(e.target.value)} 
                         className="block w-full rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all" 
                     />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Minimum 8 characters. Mix letters, numbers and symbols for strength.</p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t("auth.register.password_hint")}</p>
                 </div>
                 {/* code */}
                 <div className="mt-4">
                     <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Code <span className="text-brand-orange">*</span>
+                        {t("auth.register.code")} <span className="text-brand-orange">{t("common.required")}</span>
                     </label>
                     <input 
                         id='code' 
                         required 
                         minLength={2} 
                         maxLength={24} 
-                        placeholder="Enter your code" 
+                        placeholder={t("auth.register.code_placeholder")} 
                         type="text" 
                         value={code} 
                         onChange={(e) => setCode(e.target.value)} 
@@ -210,12 +212,12 @@ const RegisterForm: React.FC = () => {
                         type="submit" 
                         className="w-full rounded-lg bg-brand-orange px-4 py-3 text-sm font-semibold text-white hover:bg-brand-orange-dark active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 transition-all shadow-lg"
                     >
-                        Register
+                        {t("auth.register.submit")}
                     </button>
                 </div>
                 <div className="mt-4">
                     <p className="text-sm text-center text-gray-600 dark:text-gray-400">
-                        Already have an account? <Link href="/login" className="font-semibold text-brand-green hover:text-brand-green-dark">Log in</Link>
+                        {t("auth.register.have_account")} <Link href="/login" className="font-semibold text-brand-green hover:text-brand-green-dark">{t("auth.register.login_link")}</Link>
                     </p>
                 </div>
             </form >
@@ -228,8 +230,7 @@ const RegisterForm: React.FC = () => {
 
             {registerIsSuccessful &&
                 <div className="mt-4 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-3 rounded-lg border border-green-200 dark:border-green-800">
-                    <p>Registration successful! You can now <Link href="/login" className="underline font-semibold text-brand-green hover:text-brand-green-dark">log in</Link>.</p>
-                    <p className="mt-1">Redirecting to login in 5 seconds...</p>
+                    <p>{t("auth.register.success")}</p>
                 </div>}
         </div>
     )

@@ -129,7 +129,81 @@ export const removePreviousShapes = (
 };
 
 /**
+ * Convert polygon coordinates to a highlighted intersection polygon and add it to the map
+ * This keeps original circles visible and only highlights the intersection area
+ * Only ONE search area can exist at a time - any previous highlight is removed
+ * @param L - Leaflet library instance
+ * @param leafletMap - Leaflet map instance
+ * @param coordPoints - Polygon coordinates
+ * @param id - Unique ID for the polygon
+ * @param sourceIds - Array of source circle IDs that created this intersection
+ * @param setIntersections - State setter for intersections
+ * @param attachListeners - Optional callback to attach event listeners to the polygon
+ */
+export const addIntersectionHighlight = (
+    L: any,
+    leafletMap: any,
+    coordPoints: any,
+    id: number,
+    sourceIds: number[],
+    setIntersections: (fn: (prev: any[]) => any[]) => void,
+    attachListeners?: (polygon: any, id: number, L: any) => void
+) => {
+    const polygons: any[] = [];
+
+    coordPoints.forEach((multiPolygon: any) => {
+        // Convert all rings (outer + holes)
+        const allRings = multiPolygon.map((ring: any) =>
+            ring.map(([lng, lat]: [number, number]) => [lat, lng])
+        );
+
+        // Use green highlight color for the search area (where treasure could be)
+        const polygon = L.polygon(allRings, {
+            color: "#228B22", // Forest green border
+            fillColor: "#32CD32", // Lime green fill for search area
+            fillOpacity: 0.5,
+            weight: 3,
+        }).addTo(leafletMap);
+
+        // Attach event listeners if provided
+        if (attachListeners) {
+            attachListeners(polygon, id, L);
+            console.log(`Attached listeners to intersection highlight with ID: ${id}`);
+        }
+
+        polygons.push(polygon);
+    });
+
+    // Remove any existing highlights from the map and state, then add the new one
+    // Only ONE search area (highlight) can exist at a time
+    setIntersections((prev) => {
+        // Find and remove existing highlights from the map
+        prev.forEach((intersection) => {
+            if (intersection.isHighlight && intersection.polygons) {
+                intersection.polygons.forEach((p: any) => p.remove());
+            }
+        });
+        
+        // Filter out old highlights and add the new one
+        return [
+            ...prev.filter((intersection) => !intersection.isHighlight),
+            {
+                shape: coordPoints,
+                polygons: polygons,
+                id: id,
+                inside: true, // Intersection of inside circles is still "inside"
+                visible: true,
+                isHighlight: true, // Mark as highlight overlay
+                sourceIds: sourceIds, // Track which circles created this intersection
+            },
+        ];
+    });
+};
+
+/**
  * Perform union/intersection operation on two shapes
+ * For two "inside" circles: keep both circles visible and highlight only the intersection
+ * For other cases: perform the original merge behavior
  * @param shape1 - First shape (circle or intersection)
  * @param shape2 - Second shape (circle or intersection)
  * @param L - Leaflet library instance
@@ -138,8 +212,9 @@ export const removePreviousShapes = (
  * @param setCircles - State setter for circles
  * @param setIntersections - State setter for intersections
  * @param setNextId - State setter for next ID
+ * @param existingIntersections - Current intersections array to check for duplicates
  * @param attachListeners - Optional callback to attach event listeners to created polygons
- * @returns true if intersection was performed, false otherwise
+ * @returns true if intersection was performed (and shapes were modified), false otherwise
  */
 export const performUnionIntersection = (
     shape1: any,
@@ -150,6 +225,7 @@ export const performUnionIntersection = (
     setCircles: (fn: (prev: any[]) => any[]) => void,
     setIntersections: (fn: (prev: any[]) => any[]) => void,
     setNextId: (fn: (prev: number) => number) => void,
+    existingIntersections: any[],
     attachListeners?: (polygon: any, id: number, L: any) => void
 ): boolean => {
     if (!L || !leafletMap) return false;
@@ -179,106 +255,171 @@ export const performUnionIntersection = (
     const intersectionCheck = pc.intersection([[poly1]], [[poly2]]);
     if (intersectionCheck.length < 1) return false;
 
-    // Remove previous shapes from map and state
-    removePreviousShapes(shape1, shape2, setCircles, setIntersections);
+    // No merging of any circles - they should just overlap
+    // Inside circles are handled by calculateAllInsideCirclesIntersection
+    // Outside circles just stay as separate circles
+    return false;
+};
 
-    let unionPoints;
-
-    // Perform appropriate operation based on inside/outside status
-    if (shape1.inside === false && shape2.inside === false) {
-        unionPoints = pc.union([[poly1]], [[poly2]]);
-        convertPolyIntoShapeAndAddToMap(
-            L,
-            leafletMap,
-            unionPoints,
-            false,
-            nextId + 1,
-            setIntersections,
-            attachListeners
-        );
-        setNextId((prev) => prev + 1);
-    } else if (shape1.inside === true && shape2.inside === true) {
-        unionPoints = pc.intersection([[poly1]], [[poly2]]);
-        convertPolyIntoShapeAndAddToMap(
-            L,
-            leafletMap,
-            unionPoints,
-            true,
-            nextId + 1,
-            setIntersections,
-            attachListeners
-        );
-        setNextId((prev) => prev + 1);
-    } else if (shape1.inside === true && shape2.inside === false) {
-        unionPoints = pc.difference([[poly1]], [[poly2]]);
-
-        let createdCount = 0;
-        // BUGFIX: App crashes when an outside circle overlaps 100% with an inside circle. E.g. Only convert if difference operation returned a result
-        if (unionPoints && unionPoints.length > 0) {
-            convertPolyIntoShapeAndAddToMap(
-                L,
-                leafletMap,
-                unionPoints,
-                true,
-                nextId + 1,
-                setIntersections,
-                attachListeners
-            );
-            createdCount++;
-        }
-
-        // Always keep the outside shape (shape2)
-        convertPolyIntoShapeAndAddToMap(
-            L,
-            leafletMap,
-            [[poly2]],
-            false,
-            nextId + 1 + createdCount,
-            setIntersections,
-            attachListeners
-        );
-        createdCount++;
-        setNextId((prev) => prev + createdCount);
-        console.log("A - B");
-    } else if (shape1.inside === false && shape2.inside === true) {
-        unionPoints = pc.difference([[poly2]], [[poly1]]);
-
-        let createdCount = 0;
-        // BUGFIX: App crashes when an outside circle overlaps 100% with an inside circle. E.g. Only convert if difference operation returned a result
-        if (unionPoints && unionPoints.length > 0) {
-            convertPolyIntoShapeAndAddToMap(
-                L,
-                leafletMap,
-                unionPoints,
-                true,
-                nextId + 1,
-                setIntersections,
-                attachListeners
-            );
-            createdCount++;
-        }
-
-        // Always keep the outside shape (shape1)
-        convertPolyIntoShapeAndAddToMap(
-            L,
-            leafletMap,
-            [[poly1]],
-            false,
-            nextId + 1 + createdCount,
-            setIntersections,
-            attachListeners
-        );
-        createdCount++;
-        setNextId((prev) => prev + createdCount);
-    } else {
-        return false;
+/**
+ * Calculate the intersection of overlapping inside circles
+ * This computes the search area from circles that actually intersect
+ * Inside circles that don't intersect with the search area are grey
+ * @param circles - Array of circle objects (filtered to inside circles only)
+ * @param L - Leaflet library instance
+ * @param leafletMap - Leaflet map instance
+ * @param nextId - Current next ID value
+ * @param setIntersections - State setter for intersections
+ * @param setNextId - State setter for next ID
+ * @param attachListeners - Optional callback to attach event listeners to created polygons
+ */
+export const calculateAllInsideCirclesIntersection = (
+    circles: any[],
+    L: any,
+    leafletMap: any,
+    nextId: number,
+    setIntersections: (fn: (prev: any[]) => any[]) => void,
+    setNextId: (fn: (prev: number) => number) => void,
+    attachListeners?: (polygon: any, id: number, L: any) => void
+) => {
+    // Filter circles by type
+    const insideCircles = circles.filter(c => c.inside === true);
+    const outsideCircles = circles.filter(c => c.inside === false);
+    
+    if (insideCircles.length < 1) {
+        // No inside circles, remove any existing highlight
+        setIntersections((prev) => {
+            prev.forEach((intersection) => {
+                if (intersection.isHighlight && intersection.polygons) {
+                    intersection.polygons.forEach((p: any) => p.remove());
+                }
+            });
+            return prev.filter((intersection) => !intersection.isHighlight);
+        });
+        return;
     }
-
-    return true;
+    
+    // Convert outside circles to polygons for subtraction
+    const outsidePolygons = outsideCircles.map(c => circleToPolygon(c.shape));
+    
+    if (insideCircles.length === 1) {
+        // Only one inside circle - start with it as the search area
+        let searchArea: pc.MultiPolygon = [[circleToPolygon(insideCircles[0].shape)]];
+        
+        // Subtract all outside circles from the search area
+        for (const outsidePoly of outsidePolygons) {
+            searchArea = pc.difference(searchArea, [[outsidePoly]]);
+            if (searchArea.length === 0) break;
+        }
+        
+        // If there's remaining search area after subtracting outside circles
+        if (searchArea.length > 0) {
+            // Make the inside circle grey since we'll show the search area as highlight
+            insideCircles[0].shape.setStyle({
+                color: "darkgrey",
+                fillColor: "lightgrey",
+            });
+            
+            const sourceIds = [insideCircles[0].id];
+            addIntersectionHighlight(
+                L,
+                leafletMap,
+                searchArea,
+                nextId + 1,
+                sourceIds,
+                setIntersections,
+                attachListeners
+            );
+            setNextId((prev) => prev + 1);
+        } else {
+            // No search area left - circle is entirely covered by outside circles
+            insideCircles[0].shape.setStyle({
+                color: "darkgrey",
+                fillColor: "lightgrey",
+            });
+            // Remove any existing highlight
+            setIntersections((prev) => {
+                prev.forEach((intersection) => {
+                    if (intersection.isHighlight && intersection.polygons) {
+                        intersection.polygons.forEach((p: any) => p.remove());
+                    }
+                });
+                return prev.filter((intersection) => !intersection.isHighlight);
+            });
+        }
+        return;
+    }
+    
+    // With 2+ inside circles, find circles that form a valid intersection
+    // Convert all inside circles to polygons
+    const polygonsData = insideCircles.map(c => ({
+        circle: c,
+        polygon: circleToPolygon(c.shape)
+    }));
+    
+    // Find the best intersection: start with first circle and keep adding circles
+    // that intersect with the current result
+    let currentIntersection: pc.MultiPolygon = [[polygonsData[0].polygon]];
+    let participatingCircles = [polygonsData[0].circle];
+    
+    for (let i = 1; i < polygonsData.length; i++) {
+        const testIntersection = pc.intersection(currentIntersection, [[polygonsData[i].polygon]]);
+        if (testIntersection.length > 0) {
+            // This circle intersects with the current search area
+            currentIntersection = testIntersection;
+            participatingCircles.push(polygonsData[i].circle);
+        }
+        // If no intersection, this circle doesn't participate - will be grey
+    }
+    
+    // Now subtract all outside circles from the search area
+    let searchArea = currentIntersection;
+    for (const outsidePoly of outsidePolygons) {
+        searchArea = pc.difference(searchArea, [[outsidePoly]]);
+        if (searchArea.length === 0) break;
+    }
+    
+    // Set all inside circles to grey
+    insideCircles.forEach(circle => {
+        circle.shape.setStyle({
+            color: "darkgrey",
+            fillColor: "lightgrey",
+        });
+    });
+    
+    // If no search area remains after subtraction
+    if (searchArea.length === 0) {
+        // Remove any existing highlight
+        setIntersections((prev) => {
+            prev.forEach((intersection) => {
+                if (intersection.isHighlight && intersection.polygons) {
+                    intersection.polygons.forEach((p: any) => p.remove());
+                }
+            });
+            return prev.filter((intersection) => !intersection.isHighlight);
+        });
+        return;
+    }
+    
+    // We have a valid search area - show it as green highlight
+    const sourceIds = participatingCircles.map(c => c.id).sort((a, b) => a - b);
+    
+    addIntersectionHighlight(
+        L,
+        leafletMap,
+        searchArea,
+        nextId + 1,
+        sourceIds,
+        setIntersections,
+        attachListeners
+    );
+    setNextId((prev) => prev + 1);
 };
 
 /**
  * Compare all circles and intersections to find and process overlaps
+ * For inside circles: calculates the intersection of ALL inside circles (search area)
+ * For outside circles: merges overlapping outside circles
  * @param circles - Array of circle objects
  * @param intersections - Array of intersection objects
  * @param L - Leaflet library instance
@@ -300,73 +441,19 @@ export const compareShapesForIntersections = (
     setNextId: (fn: (prev: number) => number) => void,
     attachListeners?: (polygon: any, id: number, L: any) => void
 ) => {
-    if (circles.length > 1) {
-        for (let i = 0; i < circles.length; i++) {
-            for (let j = i + 1; j < circles.length; j++) {
-                console.log("Circle vs Circle:", circles[i], circles[j]);
-                if (
-                    performUnionIntersection(
-                        circles[i],
-                        circles[j],
-                        L,
-                        leafletMap,
-                        nextId,
-                        setCircles,
-                        setIntersections,
-                        setNextId,
-                        attachListeners
-                    )
-                )
-                    return;
-            }
-        }
-    }
-
-    if (intersections.length > 1) {
-        for (let i = 0; i < intersections.length; i++) {
-            for (let j = i + 1; j < intersections.length; j++) {
-                console.log(
-                    "Intersection vs Intersection:",
-                    intersections[i],
-                    intersections[j]
-                );
-                if (
-                    performUnionIntersection(
-                        intersections[i],
-                        intersections[j],
-                        L,
-                        leafletMap,
-                        nextId,
-                        setCircles,
-                        setIntersections,
-                        setNextId,
-                        attachListeners
-                    )
-                )
-                    return;
-            }
-        }
-    }
-
-    if (circles.length > 0 && intersections.length > 0) {
-        for (let i = 0; i < circles.length; i++) {
-            for (let j = 0; j < intersections.length; j++) {
-                console.log("Circle vs Intersection:", circles[i], intersections[j]);
-                if (
-                    performUnionIntersection(
-                        circles[i],
-                        intersections[j],
-                        L,
-                        leafletMap,
-                        nextId,
-                        setCircles,
-                        setIntersections,
-                        setNextId,
-                        attachListeners
-                    )
-                )
-                    return;
-            }
-        }
-    }
+    // First, calculate the intersection of ALL inside circles (the search area)
+    // This shows where the treasure could be based on all "treasure is inside" hints
+    calculateAllInsideCirclesIntersection(
+        circles,
+        L,
+        leafletMap,
+        nextId,
+        setIntersections,
+        setNextId,
+        attachListeners
+    );
+    
+    // No merging of circles - they just overlap
+    // Inside circles search area is handled by calculateAllInsideCirclesIntersection
+    // Outside circles stay as separate circles
 };

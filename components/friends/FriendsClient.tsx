@@ -7,12 +7,14 @@ import FriendService from "@services/FriendService";
 import { GetFriends, GetFriendRequests } from "@types";
 import SearchFriends from "./FriendSearch";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "next-i18next";
 
 const FriendsClient: React.FC = () => {
   const [friends, setFriends] = useState<GetFriends[]>([]);
   const [requests, setRequests] = useState<GetFriendRequests[]>([]);
   const userIdRef = useRef<number | null>(null);
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const loadFriends = async (userId: number) => {
     try {
@@ -175,12 +177,12 @@ const FriendsClient: React.FC = () => {
           >
             <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 9h2v5H9V9zm0-4h2v2H9V5z" />
           </svg>
-          My Friends
+          {t("friends.my_friends")}
         </h2>
 
         {friends.length === 0 ? (
           <p className="text-gray-500 dark:text-gray-400 italic">
-            You have no friends yet. Start connecting!
+            {t("friends.no_friends")}
           </p>
         ) : (
           <FriendList friends={friends} onRemoveFriend={handleRemoveFriend} />
@@ -197,7 +199,7 @@ const FriendsClient: React.FC = () => {
           >
             <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM9 9h2v5H9V9zm0-4h2v2H9V5z" />
           </svg>
-          Friend Requests
+          {t("friends.requests")}
         </h2>
 
         <FriendRequests

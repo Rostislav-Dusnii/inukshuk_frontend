@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { HintInputDto } from "@types";
+import { useTranslation } from "next-i18next";
 
 interface AddHintFormProps {
   onAdd: (input: HintInputDto) => void;
@@ -11,24 +12,25 @@ const AddHintForm: React.FC<AddHintFormProps> = ({ onAdd }) => {
   const [errors, setErrors] = useState<{ title?: string; content?: string }>(
     {}
   );
+  const { t } = useTranslation("common");
 
   const validate = (): boolean => {
     const newErrors: { title?: string; content?: string } = {};
 
     if (!title.trim()) {
-      newErrors.title = "Title is required";
+      newErrors.title = t("admin.hints.hint_title_need1");
     } else if (title.length < 3) {
-      newErrors.title = "Title must be at least 3 characters long";
+      newErrors.title = t("admin.hints.hint_title_need2");
     } else if (title.length > 100) {
-      newErrors.title = "Title cannot exceed 100 characters";
+      newErrors.title = t("admin.hints.hint_title_need3");
     }
 
     if (!content.trim()) {
-      newErrors.content = "Content is required";
+      newErrors.content = t("admin.hints.hint_content_need1");
     } else if (content.length < 5) {
-      newErrors.content = "Content must be at least 5 characters long";
+      newErrors.content = t("admin.hints.hint_content_need2");
     } else if (content.length > 500) {
-      newErrors.content = "Content cannot exceed 500 characters";
+      newErrors.content = t("admin.hints.hint_content_need3");
     }
 
     setErrors(newErrors);
@@ -51,14 +53,14 @@ const AddHintForm: React.FC<AddHintFormProps> = ({ onAdd }) => {
       className="space-y-4 p-4 border border-brand-green-light rounded-md bg-white dark:bg-gray-900 dark:border-gray-700"
     >
       <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
-        <span className="text-brand-orange-dark ">ADD </span>
-        <span className="text-brand-green-dark ">NEW </span>
-        <span className="text-gray-800 dark:text-white">HINT</span>
+        <span className="text-brand-orange-dark ">{t("admin.hints.add_new.1").toUpperCase()} </span>
+        <span className="text-brand-green-dark ">{t("admin.hints.add_new.2").toUpperCase()} </span>
+        <span className="text-gray-800 dark:text-white">{t("admin.hints.add_new.3").toUpperCase()}</span>
       </h2>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Title
+          {t("admin.hints.hint_title")}
         </label>
         <input
           type="text"
@@ -74,7 +76,7 @@ const AddHintForm: React.FC<AddHintFormProps> = ({ onAdd }) => {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Content
+          {t("admin.hints.hint_content")}
         </label>
         <textarea
           value={content}
@@ -91,10 +93,11 @@ const AddHintForm: React.FC<AddHintFormProps> = ({ onAdd }) => {
         type="submit"
         className="bg-brand-green-light border border-brand-green-light text-white px-4 py-2 rounded-md hover:bg-brand-green-dark dark:bg-brand-green-dark dark:border-brand-green-dark dark:hover:bg-brand-green-light"
       >
-        Add Hint
+        {t("admin.hints.add")}
       </button>
     </form>
   );
 };
 
 export default AddHintForm;
+

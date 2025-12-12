@@ -1,12 +1,14 @@
 import Link from "next/link";
 import Header from "@components/header";
 import { Lock, Lightbulb, User } from "lucide-react";
+import { useTranslation } from "next-i18next";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation("common");
   return (
     <>
       <Header />
@@ -17,7 +19,7 @@ export default function AdminLayout({
         >
           <div className="flex-1">
             <h2 className="text-3xl font-extrabold mb-8 text-brand-green-dark text-center dark:text-brand-orange">
-              Admin Panel
+              {t("admin.title")}
             </h2>
 
             <ul className="space-y-2">
@@ -26,20 +28,20 @@ export default function AdminLayout({
                   href="/admin/event-code-settings"
                   className="font-semibold"
                 >
-                  Registration Code
+                  {t("admin.registration_code")}
                 </Link>
                 <Lock className="w-6 h-6 justify-self-end text-brand-orange-dark" />
               </li>
 
               <li className="grid grid-cols-[1fr_24px] items-center px-2 py-2 rounded hover:bg-popover transition">
                 <Link href="/admin/hints" className="font-semibold">
-                  Hints
+                  {t("admin.hint_settings")}
                 </Link>
                 <Lightbulb className="w-6 h-6 justify-self-end text-brand-orange-dark" />
               </li>
               <li className="grid grid-cols-[1fr_24px] items-center px-2 py-2 rounded hover:bg-popover transition">
                 <Link href="/admin/users" className="font-semibold">
-                  Users
+                  {t("admin.user_settings")}
                 </Link>
                 <User className="w-6 h-6 justify-self-end text-brand-orange-dark" />
               </li>

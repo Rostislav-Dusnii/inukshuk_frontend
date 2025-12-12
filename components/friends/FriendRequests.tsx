@@ -2,6 +2,7 @@
 
 import { GetFriendRequests } from "@types";
 import React from "react";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   requests: GetFriendRequests[];
@@ -19,7 +20,7 @@ const FriendRequests: React.FC<Props> = ({
   const incomingRequests = requests.filter(
     (r) => r.receiver?.id === currentUserId && r.status === "PENDING"
   );
-
+  const { t } = useTranslation("common");
   return (
     <ul className="divide-y divide-gray-200 dark:divide-gray-700">
       {incomingRequests.map((r) => (
@@ -47,7 +48,7 @@ const FriendRequests: React.FC<Props> = ({
                          bg-brand-orange text-white border-brand-orange
                          hover:bg-brand-orange-darker transition"
             >
-              Accept
+              {t("friends.accept")}
             </button>
             <button
               onClick={() => onDecline(r.id)}
@@ -55,7 +56,7 @@ const FriendRequests: React.FC<Props> = ({
                          bg-brand-green text-white 
                          hover:bg-brand-green-darker border-brand-green transition"
             >
-              Decline
+              {t("friends.decline")}
             </button>
           </div>
         </li>
@@ -63,7 +64,7 @@ const FriendRequests: React.FC<Props> = ({
 
       {incomingRequests.length === 0 && (
         <li className="py-3 px-4 text-sm text-gray-500 dark:text-gray-400">
-          No new requests
+          {t("friends.no_requests")}
         </li>
       )}
     </ul>

@@ -10,6 +10,7 @@ import React, {
 import FriendService from "@services/FriendService";
 import { GetFriends, GetFriendRequests } from "@types";
 
+
 type FriendsContextValue = {
   userId: number | null;
   friends: GetFriends[];
@@ -30,6 +31,7 @@ export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [requests, setRequests] = useState<GetFriendRequests[]>([]);
   const userIdRef = useRef<number | null>(null);
 
+  
   const refreshAll = async () => {
     const uid = userIdRef.current;
     if (!uid) return;
@@ -99,3 +101,5 @@ export const useFriends = () => {
   if (!ctx) throw new Error("useFriends must be used within FriendsProvider");
   return ctx;
 };
+
+

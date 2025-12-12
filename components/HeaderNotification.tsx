@@ -3,13 +3,15 @@
 import { useEffect, useState, useRef } from "react";
 import FriendService from "@services/FriendService";
 import { MessageCircle } from "lucide-react";
+import { useTranslation } from "next-i18next";
+
 
 const HeaderNotification: React.FC = () => {
   const [pendingCount, setPendingCount] = useState(0);
   const [requests, setRequests] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
   const userIdRef = useRef<number | null>(null);
-
+const { t } = useTranslation("common");
   useEffect(() => {
     const stored = sessionStorage.getItem("loggedInUser");
     if (!stored) return;
@@ -78,7 +80,7 @@ const HeaderNotification: React.FC = () => {
         <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-900 shadow-lg rounded p-2 z-50">
           {requests.length === 0 ? (
             <p className="text-sm text-brand-orange-lighter">
-              Geen nieuwe verzoeken
+              {t("friends.no_requests")}
             </p>
           ) : (
             requests.map((r) => (
@@ -87,7 +89,7 @@ const HeaderNotification: React.FC = () => {
                 className="flex items-center justify-between py-2 border-b border-brand-orange-lighter"
               >
                 <span className="text-sm text-brand-green-darker">
-                  @{r.sender?.username} sent a friend request
+                  @{r.sender?.username} {t("friends.sent_a_request")}
                 </span>
               </div>
             ))
@@ -99,3 +101,4 @@ const HeaderNotification: React.FC = () => {
 };
 
 export default HeaderNotification;
+

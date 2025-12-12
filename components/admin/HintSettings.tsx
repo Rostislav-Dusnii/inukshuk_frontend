@@ -5,6 +5,8 @@ import { Hint, HintInputDto } from "@types";
 import AddHintForm from "./AddHintForm";
 import { HintList } from "./HintList";
 
+
+
 export const HintManager: React.FC = () => {
   const [hints, setHints] = useState<Hint[]>([]);
 
@@ -44,3 +46,5 @@ export const HintManager: React.FC = () => {
     </div>
   );
 };
+
+

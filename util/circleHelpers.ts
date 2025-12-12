@@ -127,6 +127,30 @@ export const toggleCircleVisibility = (
 };
 
 /**
+ * Helper function to calculate the appropriate zoom level based on circle radius
+ * This ensures the circle fits nicely in the viewport when created or navigated to
+ * @param radiusInMeters - The radius of the circle in meters
+ * @returns The optimal zoom level for the given radius
+ */
+export const calculateZoomForRadius = (radiusInMeters: number): number => {
+    // Approximate meters per pixel at zoom level 0 at the equator
+    // At zoom 0, the world is 256 pixels wide, Earth's circumference is ~40,075,000 meters
+    const metersPerPixelAtZoom0 = 40075000 / 256;
+    
+    // We want the circle diameter to take up about 60% of the viewport width
+    // Assuming a typical viewport width of ~800 pixels, that's ~480 pixels for the diameter
+    const desiredDiameterInPixels = 400;
+    const diameterInMeters = radiusInMeters * 2;
+    
+    // Calculate zoom level: metersPerPixel = metersPerPixelAtZoom0 / (2^zoom)
+    // Therefore: zoom = log2(metersPerPixelAtZoom0 * desiredDiameterInPixels / diameterInMeters)
+    const zoom = Math.log2((metersPerPixelAtZoom0 * desiredDiameterInPixels) / diameterInMeters);
+    
+    // Clamp zoom between reasonable bounds (1-19)
+    return Math.max(1, Math.min(19, Math.round(zoom)));
+};
+
+/**
  * Helper function to zoom to a specific shape on the map
  * @param shapeId - The ID of the shape to zoom to
  * @param circles - Array of circle objects

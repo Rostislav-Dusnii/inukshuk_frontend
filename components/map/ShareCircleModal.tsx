@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import CircleService from "@services/CircleService";
 import { CircleData } from "@types";
 import ModalComponent from "./ModalComponent";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   circles: any[];
@@ -15,6 +16,7 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation("common");
 
   // Reset state when modal closes
   useEffect(() => {
@@ -35,7 +37,7 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
     try {
       const loggedInUserString = sessionStorage.getItem("loggedInUser");
       if (!loggedInUserString) {
-        setError("You must be logged in to share circles");
+        setError(t("map.share_modal.share_error"));
         setIsLoading(false);
         return;
       }
@@ -44,7 +46,7 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
       const token = loggedInUser.token;
 
       if (!token) {
-        setError("You must be logged in to share circles");
+        setError(t("map.share_modal.share_error"));
         setIsLoading(false);
         return;
       }
@@ -72,7 +74,7 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
       setSuccess(true);
     } catch (err: any) {
       console.error("Share error:", err);
-      const errorMsg = err?.message || "Failed to share circles. Please try again.";
+      const errorMsg = err?.message || `${t("map.share_modal.error")} ${t("error.again")}`;
       setError(errorMsg);
     } finally {
       setIsLoading(false);
@@ -89,7 +91,7 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
     <ModalComponent
       isOpen={isOpen}
       onClose={onClose}
-      title={success ? "Circles Shared! 🎉" : "Share Your Circles"}
+      title={success ? t("map.share_modal.header2") : t("map.share_modal.header1")}
       dismissible={!isLoading}
       showCloseButton={!isLoading}
       showFooterClose={false}
@@ -99,12 +101,11 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
           <>
             <div className="text-center">
               <p className="text-gray-700 dark:text-gray-300 mb-2">
-                You are about to share <span className="font-bold text-brand-orange">{circles.length}</span> circle
-                {circles.length !== 1 ? "s" : ""}.
+                {t("map.share_modal.confirmation1")}<span className="font-bold text-brand-orange">{circles.length}</span> {t("map.share_modal.confirmation2")}
+                {circles.length !== 1 ? t("map.share_modal.plural") : ""}.
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Recipients will be able to view your circles on a read-only map
-                with all coordinates, radius, and inside/outside labels.
+                {t("map.share_modal.info")}
               </p>
             </div>
 
@@ -119,20 +120,20 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
               disabled={isLoading || circles.length === 0}
               className="w-full px-6 py-3 rounded-lg bg-brand-orange text-white font-semibold hover:bg-brand-orange-dark active:scale-95 transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-orange disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-orange"
             >
-              {isLoading ? "Generating Link..." : "Generate Shareable Link"}
+              {isLoading ? t("map.share_modal.generating") : t("map.share_modal.generate_link")}
             </button>
           </>
         ) : (
           <>
             <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-3 rounded">
               <p className="text-green-700 dark:text-green-400 font-semibold">
-                ✓ Circles shared successfully!
+                ✓ {t("map.share_modal.success")}
               </p>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="share-url-input" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Share this link:
+                {t("map.share_modal.share_link")}
               </label>
               <div className="flex gap-2">
                 <input
@@ -147,20 +148,20 @@ const ShareCircleModal: React.FC<Props> = ({ circles, isOpen, onClose }) => {
                   onClick={handleCopyLink}
                   className="px-6 py-2 bg-green-600 border border-green-600 text-white rounded-lg font-semibold hover:bg-green-700 hover:border-green-700 active:scale-95 transition-all shadow-md whitespace-nowrap cursor-pointer inline-flex items-center"
                 >
-                  {copied ? "✓ Copied!" : "Copy"}
+                  {copied ? `✓ ${t("map.share_modal.link_copied")}!` : t("map.share_modal.copy_link")}
                 </a>
               </div>
             </div>
 
             <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-              Share this link with other players so they can view your circles.
+              {t("map.share_modal.tip")}
             </p>
 
             <button
               onClick={onClose}
               className="w-full px-6 py-3 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition-all focus:outline-none"
             >
-              Close
+              {t("common.close")}
             </button>
           </>
         )}

@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react";
 import AccessDenied from "./AccessDenied";
 import AdminLayout from "./AdminLayout";
+import { useTranslation } from "next-i18next";
+// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+// import { GetStaticProps } from "next";
 
 interface AdminClientPageProps {
   children?: React.ReactNode;
@@ -11,6 +14,7 @@ interface AdminClientPageProps {
 const AdminClientPage: React.FC<AdminClientPageProps> = ({ children }) => {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     const loggedInUserString = sessionStorage.getItem("loggedInUser");
@@ -22,7 +26,7 @@ const AdminClientPage: React.FC<AdminClientPageProps> = ({ children }) => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t("common.loading")}...</div>;
   }
 
   if (!role || role.toUpperCase() !== "ADMIN") {
@@ -33,9 +37,9 @@ const AdminClientPage: React.FC<AdminClientPageProps> = ({ children }) => {
     <AdminLayout>
       {children || (
         <div>
-          <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold mb-4">{t("admin.dashboard")}</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Welcome to the admin panel. Use the sidebar to navigate.
+            {t("admin.welcomeMessage")}
           </p>
         </div>
       )}
@@ -44,3 +48,4 @@ const AdminClientPage: React.FC<AdminClientPageProps> = ({ children }) => {
 };
 
 export default AdminClientPage;
+

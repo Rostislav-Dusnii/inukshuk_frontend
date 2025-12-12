@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslation } from "next-i18next";
 
 interface MapClickHandlerProps {
   map: any;
@@ -24,7 +25,7 @@ const MapClickHandler: React.FC<MapClickHandlerProps> = ({
   setSelectedMarkerId,
 }) => {
   const markersRef = useRef<{ id: number; marker: any }[]>([]);
-
+  const { t } = useTranslation("common");
   // Sync markers from markersData prop
   useEffect(() => {
     if (!map || !leafletLib) return;
@@ -96,7 +97,7 @@ const MapClickHandler: React.FC<MapClickHandlerProps> = ({
           const markerToRemove = ev.target;
           const popupContent = L.DomUtil.create("div");
           const btn = L.DomUtil.create("button", "", popupContent);
-          btn.textContent = "Delete marker";
+          btn.textContent =  t("map.marker.delete");
           Object.assign(btn.style, {
             background: "#ef4444",
             color: "white",
@@ -116,14 +117,24 @@ const MapClickHandler: React.FC<MapClickHandlerProps> = ({
             markersRef.current = markersRef.current.filter(
               (m) => m.id !== markerData.id
             );
-            setMarkersData((prev) => prev.filter((m) => m.id !== markerData.id));
+            setMarkersData((prev) =>
+              prev.filter((m) => m.id !== markerData.id)
+            );
             setSelectedMarkerId(null);
             map.closePopup(popup);
           };
         });
       }
     });
-  }, [map, leafletLib, markersData, setLatitude, setLongitude, setMarkersData, setSelectedMarkerId]);
+  }, [
+    map,
+    leafletLib,
+    markersData,
+    setLatitude,
+    setLongitude,
+    setMarkersData,
+    setSelectedMarkerId,
+  ]);
 
   useEffect(() => {
     if (!map || !leafletLib) return;
@@ -147,7 +158,11 @@ const MapClickHandler: React.FC<MapClickHandlerProps> = ({
 
     const handleRightClick = (e: any) => {
       // Check if the click target is a path (circle) - if so, don't handle it here
-      if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.tagName === 'path') {
+      if (
+        e.originalEvent &&
+        e.originalEvent.target &&
+        e.originalEvent.target.tagName === "path"
+      ) {
         return;
       }
 
@@ -216,7 +231,7 @@ const MapClickHandler: React.FC<MapClickHandlerProps> = ({
           const markerToRemove = ev.target;
           const popupContent = L.DomUtil.create("div");
           const btn = L.DomUtil.create("button", "", popupContent);
-          btn.textContent = "Delete marker";
+          btn.textContent = t("map.mapClear.yes");
           Object.assign(btn.style, {
             background: "#ef4444",
             color: "white",

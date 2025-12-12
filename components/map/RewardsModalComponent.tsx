@@ -4,6 +4,7 @@ import React from "react";
 import RewardsIconComponent from "./RewardsIconComponent";
 import HintsService from "@services/HintService";
 import { Hint } from "@types";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   counter: number;
@@ -18,6 +19,7 @@ const RewardsModalComponent: React.FC<Props> = ({
 }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeHint, setActiveHint] = useState<Hint | null>(null);
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     if (!earnedReward && counter > 7) {
@@ -37,17 +39,17 @@ const RewardsModalComponent: React.FC<Props> = ({
   return (
     <>
       <ModalComponent
-        title="Reward Earned"
+        title={t("map.rewards.title")}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       >
         <div className="space-y-5">
           <div className="text-center py-4">
             <h3 className="text-3xl font-semibold text-brand-green dark:text-brand-green-light mb-2">
-              Congratulations! 🎉
+              {t("map.rewards.congratulations")}
             </h3>
             <p className="text-xl text-brand-orange dark:text-brand-orange-light font-medium">
-              You&apos;ve earned a hint
+              {t("map.rewards.hint_earned")}
             </p>
           </div>
 
@@ -69,18 +71,19 @@ const RewardsModalComponent: React.FC<Props> = ({
             </div>
           ) : (
             <div className="text-center text-gray-500 dark:text-gray-400">
-              No active hint available
+              {t("map.rewards.no_hint")}
             </div>
           )}
 
           <div className="text-sm text-gray-600 dark:text-gray-400 pt-2">
             <p>
-              Note: You can access this message again by clicking the rewards icon in the bottom left corner.
+              {t("map.rewards.note")}
             </p>
           </div>
         </div>
       </ModalComponent>
-    </>)
-}
+    </>
+  );
+};
 
 export default RewardsModalComponent;

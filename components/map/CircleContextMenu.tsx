@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "next-i18next";
+
 
 interface CircleContextMenuProps {
     x: number;
@@ -17,6 +19,7 @@ export default function CircleContextMenu({
 }: CircleContextMenuProps) {
     const menuRef = useRef<HTMLDivElement>(null);
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const { t } = useTranslation("common");
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -91,12 +94,12 @@ export default function CircleContextMenu({
                             fontWeight: "normal",
                         }}
                     >
-                        Delete circle
+                        {t("map.deleteCircle")}
                     </button>
                 ) : (
                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                         <p style={{ margin: "0", fontSize: "14px", color: "#333", textAlign: "center" }}>
-                            Are you sure?
+                            {t("map.confirm")}
                         </p>
                         <div style={{ display: "flex", gap: "8px" }}>
                             <button
@@ -113,7 +116,7 @@ export default function CircleContextMenu({
                                     flex: 1,
                                 }}
                             >
-                                Yes
+                                {t("map.circle.yes")}
                             </button>
                             <button
                                 onClick={() => setShowConfirmation(false)}
@@ -129,7 +132,7 @@ export default function CircleContextMenu({
                                     flex: 1,
                                 }}
                             >
-                                No
+                                {t("map.circle.no")}
                             </button>
                         </div>
                     </div>
@@ -138,3 +141,6 @@ export default function CircleContextMenu({
         </div>
     );
 }
+
+
+
