@@ -1,0 +1,425 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+
+  /* Modal animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .animate-scaleIn {
+    animation: scaleIn 0.3s ease-out;
+  }
+}
+
+@layer base {
+
+  /* Ensure full-height layout and prevent tiny horizontal scroll */
+  html,
+  body,
+  #__next {
+    height: 100%;
+  }
+
+  /* Avoid accidental horizontal overflow from large decorative elements */
+  body {
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300;
+  }
+
+  h1 {
+    @apply text-center text-gray-900 dark:text-white text-3xl;
+  }
+
+  thead tr {
+    @apply px-6 py-3 text-left;
+  }
+
+  tbody tr {
+    @apply border-b even:bg-gray-100 hover:bg-gray-200;
+  }
+
+  td,
+  th {
+    @apply px-6 py-3;
+  }
+
+  table {
+    @apply text-sm;
+  }
+
+  .customDatePickerWidth,
+  .customDatePickerWidth>div.react-datepicker-wrapper,
+  .customDatePickerWidth>div>div.react-datepicker__input-container .customDatePickerWidth>div>div.react-datepicker__input-container input {
+    @apply w-full;
+  }
+
+  :root {
+    --circle_menu-width: 260px;
+    --circle_menu-padding: 1em;
+    --circle_menu-bg: rgba(255, 255, 255, 0.95);
+    --circle_menu-radius: 12px;
+    --circle_menu-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    --z-circle_menu: 999;
+
+    /* Brand Colors - RAL 2000 and RAL 6025 */
+    --brand-orange: #ED760E;
+    --brand-orange-light: #F59A4A;
+    --brand-orange-lighter: #FBBD7E;
+    --brand-orange-dark: #C56209;
+    --brand-orange-darker: #9E4F07;
+    --brand-green: #3D642D;
+    --brand-green-light: #5A8444;
+    --brand-green-lighter: #7EA566;
+    --brand-green-dark: #2D4A21;
+    --brand-green-darker: #1F3317;
+  }
+
+  /* container: fixed at right center */
+  .map-circle_menu {
+    position: fixed;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--circle_menu-width);
+    max-width: calc(100% - 32px);
+    background: var(--circle_menu-bg);
+    padding: var(--circle_menu-padding);
+    border-radius: var(--circle_menu-radius);
+    box-shadow: var(--circle_menu-shadow);
+    z-index: var(--z-circle_menu);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial;
+    color: #111;
+    transition: transform 220ms ease, opacity 220ms ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    isolation: isolate;
+
+    text-align: center;
+
+    h2,
+    h3 {
+      padding: 1em;
+    }
+  }
+
+  .map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Page layout helpers that use header height measured at runtime */
+  /* Page root should occupy the remaining viewport below the header
+     (do NOT set it to 100vh because the header is rendered above it). */
+  .page-root {
+    min-height: calc(100vh - var(--header-height, 64px));
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page-main {
+    flex: 1 1 auto;
+    /* Let the wrapper define the height; main becomes scrollable when needed */
+    overflow-y: auto;
+  }
+
+  /* Map should fill the remaining viewport height when used as a full-screen map */
+  .map-wrapper {
+    height: calc(100vh - var(--header-height, 64px));
+  }
+
+  .slider_manual_input {
+    width: 10%;
+  }
+
+  .slider-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+  }
+
+  .slider-group label {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    @apply text-gray-900 dark:text-gray-100;
+    font-weight: 600;
+  }
+
+  .slider-group input[type="number"] {
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    @apply dark:border-gray-600;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    @apply bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100;
+  }
+
+  .slider-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--brand-orange);
+    box-shadow: 0 0 0 3px rgba(237, 118, 14, 0.08);
+  }
+
+  .slider-group input[type="number"]:hover {
+    border-color: var(--brand-orange-light);
+  }
+
+  .slider-group span {
+    font-weight: 600;
+    color: var(--brand-orange);
+  }
+
+  /* Slider styling */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 4px;
+    background: #ddd;
+    outline: none;
+    transition: background 0.3s;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brand-orange);
+    cursor: pointer;
+    border: 2px solid var(--brand-green);
+    transition: all 0.2s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--brand-orange-light);
+    transform: scale(1.1);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brand-orange);
+    cursor: pointer;
+    border: 2px solid var(--brand-green);
+    transition: all 0.2s;
+  }
+
+  input[type="range"]::-moz-range-thumb:hover {
+    background: var(--brand-orange-light);
+    transform: scale(1.1);
+  }
+
+  .circle-box {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: max-content;
+    z-index: 1000;
+
+    >* {
+      margin: 1rem;
+    }
+  }
+
+  .circle-maker-box {
+    @apply bg-white dark:bg-gray-800;
+    border: 4px solid var(--brand-orange);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    min-width: 350px;
+
+    div {
+      padding: 5px;
+    }
+
+    h3 {
+      @apply text-gray-900 dark:text-gray-100;
+      font-weight: 600;
+    }
+  }
+
+  .input-fields-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .settings-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .status-message-latitude,
+  .status-message-longitude {
+    color: red;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    text-align: left;
+  }
+
+  .share-circles-button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .share-circles-button:hover:not(:disabled) {
+    background-color: #218838;
+  }
+
+  .share-circles-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .circle-select-box {
+    @apply bg-white dark:bg-gray-800;
+    border: 4px solid var(--brand-green);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+
+    h3 {
+      @apply text-gray-900 dark:text-gray-100;
+      font-weight: 600;
+    }
+  }
+
+  button {
+    background: var(--brand-orange);
+    border: 2px solid var(--brand-orange-dark);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    /* margin-top: 1rem; */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  button:hover {
+    background: var(--brand-orange-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  button:active {
+    background: var(--brand-orange-darker);
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Container for radio group */
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 10px;
+    font-family: sans-serif;
+  }
+
+  /* Label for the group */
+  .radio-label {
+    font-weight: 600;
+    @apply text-gray-900 dark:text-gray-100;
+  }
+
+  /* Wraps the options side by side */
+  .radio-options {
+    display: flex;
+    gap: 16px;
+  }
+
+  /* Hide the default radio look */
+  .radio-options input[type="radio"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #aaa;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-right: 6px;
+    position: relative;
+    top: 3px;
+  }
+
+  /* Checked state */
+  .radio-options input[type="radio"]:checked {
+    border-color: var(--brand-orange);
+    background: radial-gradient(var(--brand-orange) 45%, transparent 46%);
+  }
+
+  /* Label text */
+  .radio-options span {
+    @apply text-gray-900 dark:text-gray-100;
+    font-size: 14px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    font-weight: 500;
+  }
+
+  /* Hover effects */
+  .radio-options input[type="radio"]:hover {
+    border-color: var(--brand-orange-light);
+  }
+}

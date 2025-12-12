@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "types": [
+      "cypress"
+    ],
+    "paths": {
+      "@components/*": [
+        "../components/*"
+      ],
+      "@services/*": [
+        "../services/*"
+      ],
+      "@types": [
+        "../types/index.ts"
+      ],
+      "@styles/*": [
+        "../styles/*"
+      ],
+      "@util/*": [
+        "../util/*"
+      ],
+    },
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "strictNullChecks": true
+  },
+  "include": [
+    "**/*.ts",
+    "../cypress.config.ts",
+    "**/*.feature"
+  ],
+}
