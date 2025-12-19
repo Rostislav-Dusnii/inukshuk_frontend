@@ -57,7 +57,7 @@ const Header: React.FC = () => {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <div className="relative">
               <img
-                src="/images/new.png"
+                src="/images/logo.png"
                 alt="Treasure Hunt logo"
                 width={40}
                 height={40}
