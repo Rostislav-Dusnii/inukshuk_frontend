@@ -50,7 +50,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800 shadow-sm sticky top-0 z-50 transition-colors duration-300">
+    <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-800 shadow-sm sticky top-0 z-[2000] transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
@@ -110,7 +110,7 @@ const Header: React.FC = () => {
             )}
 
             <Link
-              href={loggedInUser ? "/circle" : "/login"}
+              href={loggedInUser ? "/map" : "/login"}
               className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-green text-brand-green hover:bg-brand-green hover:text-white active:scale-95 transition-all ml-1"
             >
               {t("nav.map")}
@@ -172,12 +172,22 @@ const Header: React.FC = () => {
                   </Link>
 
                   <Link
-                    href="/circle"
+                    href="/map"
                     onClick={() => setMobileMenuOpen(false)}
                     className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-green text-brand-green hover:bg-brand-green hover:text-white active:scale-95 transition-all"
                   >
                     {t("nav.map")}
                   </Link>
+
+                  {loggedInUser.role?.toUpperCase() === "ADMIN" && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-brand-orange text-brand-orange hover:bg-brand-orange hover:text-white active:scale-95 transition-all"
+                    >
+                      {t("nav.admin")}
+                    </Link>
+                  )}
 
                   <Link
                     href="/"

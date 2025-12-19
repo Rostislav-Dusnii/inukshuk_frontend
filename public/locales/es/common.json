@@ -90,6 +90,7 @@
     "loginHere": "Inicia sesión aquí"
   },
   "map": {
+    "page_title": "Dibujo de Círculos",
     "createCircle": "Crear círculo",
     "createNewCircle": "Crear nuevo círculo",
     "deleteCircle": "Eliminar círculo",
@@ -279,7 +280,11 @@
     },
     "hints": {
       "title": "Configuración de pistas",
-      "add_new": { "1": "Agregar", "2": "Nueva", "3": "Pista" },
+      "add_new": {
+        "1": "Agregar",
+        "2": "Nueva",
+        "3": "Pista"
+      },
       "hint_title": "Título",
       "hint_title_need1": "El título es obligatorio",
       "hint_title_need2": "El título debe tener mínimo 3 caracteres",

@@ -39,8 +39,11 @@ const MapContainerComponent = forwardRef<MapContainerRef, MapContainerComponentP
         const setMapView = (lat: number, lng: number, zoom: number) => {
             if (!leafletMap.current && leafletLib.current && mapRef.current) {
                 leafletMap.current = leafletLib.current
-                    .map(mapRef.current)
+                    .map(mapRef.current, { zoomControl: false, attributionControl: false })
                     .setView([lat, lng], zoom);
+
+                // Add zoom control to the top-right corner
+                leafletLib.current.control.zoom({ position: 'topright' }).addTo(leafletMap.current);
             }
         };
 
@@ -72,7 +75,7 @@ const MapContainerComponent = forwardRef<MapContainerRef, MapContainerComponentP
         }, []);
 
         return (
-            <div className="map-wrapper">
+            <div className="map-wrapper" style={{ height: "100%", width: "100%" }}>
                 <div
                     ref={mapRef}
                     id="map"

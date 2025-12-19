@@ -5,8 +5,7 @@ import { StatusMessage } from "@types";
 import Link from "next/link";
 import Header from "@components/header";
 
-
-import { useTranslation } from "next-i18next"; 
+import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetStaticProps } from "next";
 
@@ -52,7 +51,7 @@ const ForgotPassword: React.FC = () => {
           {
             message:
               data.message ||
-               t("auth.forgot_password.status_message1"),
+              t("auth.forgot_password.status_message1"),
             type: "success",
           },
         ]);
@@ -70,7 +69,7 @@ const ForgotPassword: React.FC = () => {
         setStatusMessages([
           {
             message:
-              errorData.message ||  t("error.generic"), //"An error occurred. Please try again.",
+              errorData.message || t("error.generic"), //"An error occurred. Please try again.",
             type: "error",
           },
         ]);
@@ -80,7 +79,7 @@ const ForgotPassword: React.FC = () => {
       setStatusMessages([
         {
           message:
-             t("auth.login.error_connection"),
+            t("auth.login.error_connection"),
           type: "error",
         },
       ]);
@@ -107,11 +106,10 @@ const ForgotPassword: React.FC = () => {
           {statusMessages.map((msg, idx) => (
             <div
               key={idx}
-              className={`mb-4 p-3 rounded-lg ${
-                msg.type === "error"
+              className={`mb-4 p-3 rounded-lg ${msg.type === "error"
                   ? "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800"
                   : "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800"
-              }`}
+                }`}
             >
               {msg.message}
             </div>
@@ -123,7 +121,7 @@ const ForgotPassword: React.FC = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
-                {t("auth.forgot_password.email")} 
+                {t("auth.forgot_password.email")}
               </label>
               <input
                 id="email"
@@ -163,9 +161,9 @@ export default ForgotPassword;
 
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-    return {
-        props: {
-            ...(await serverSideTranslations(locale ?? 'en', ['common'])),
-        },
-    };
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
 };

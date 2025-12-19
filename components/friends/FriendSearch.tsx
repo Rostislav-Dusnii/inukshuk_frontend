@@ -82,7 +82,7 @@ const SearchFriends: React.FC<Props> = ({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full h-10 rounded-md bg-white dark:bg-gray-800 
-                     text-sm text-brand-green-darker placeholder-brand-orange 
+                     text-sm text-brand-green-darker dark:text-white placeholder-brand-orange dark:placeholder-brand-orange-lighter 
                      border border-transparent px-4 pr-10
                      focus:outline-none focus:ring-2 focus:ring-brand-orange-lighter"
         />
@@ -157,10 +157,10 @@ const SearchFriends: React.FC<Props> = ({
                 >
                   {/* Naam + username */}
                   <div className="flex flex-col">
-                    <span className="font-medium text-brand-green-darker">
+                    <span className="font-medium text-brand-green-darker dark:text-white">
                       {user.firstName} {user.lastName}
                     </span>
-                    <span className="text-sm text-brand-orange-darker">
+                    <span className="text-sm text-brand-orange-darker dark:text-brand-orange-lighter">
                       @{user.username}
                     </span>
                   </div>

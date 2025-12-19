@@ -3,7 +3,7 @@ import Page from "../base_page";
 class CirclePage extends Page {
 
     public constructor() {
-        super("/circle", "Treasure Hunt");
+        super("/map", "Treasure Hunt");
     }
 
     verify(): void {

@@ -90,6 +90,7 @@
     "loginHere": "Login here"
   },
   "map": {
+    "page_title": "Circle Drawing",
     "createCircle": "Create Circle",
     "createNewCircle": "Create new circle",
     "deleteCircle": "Delete Circle",
@@ -118,7 +119,7 @@
       "hide": "Hide Marker",
       "show": "Show Marker"
     },
-    "location":{
+    "location": {
       "myLocation": "My Location",
       "support_disabled": "Geolocation is not supported by your browser.",
       "denied": "Location access denied. Please enable it in settings to use this feature.",
@@ -279,7 +280,11 @@
     },
     "hints": {
       "title": "Hint Settings",
-      "add_new": { "1": "Add", "2": "New", "3": "Hint" },
+      "add_new": {
+        "1": "Add",
+        "2": "New",
+        "3": "Hint"
+      },
       "hint_title": "Title",
       "hint_title_need1": "Title is required",
       "hint_title_need2": "Title must be at least 3 characters long",

@@ -90,6 +90,7 @@
     "loginHere": "Hier anmelden"
   },
   "map": {
+    "page_title": "Kreiszeichnung",
     "createCircle": "Kreis erstellen",
     "createNewCircle": "Neuen Kreis erstellen",
     "deleteCircle": "Kreis löschen",
@@ -279,7 +280,11 @@
     },
     "hints": {
       "title": "Hinweis-Einstellungen",
-      "add_new": { "1": "Neuen", "2": "Hinweis", "3": "hinzufügen" },
+      "add_new": {
+        "1": "Neuen",
+        "2": "Hinweis",
+        "3": "hinzufügen"
+      },
       "hint_title": "Titel",
       "hint_title_need1": "Titel ist erforderlich",
       "hint_title_need2": "Titel muss mindestens 3 Zeichen lang sein",

@@ -1,8 +1,6 @@
 "use client";
-// import { useTranslation } from "next-i18next";
-// import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-// import { GetStaticProps } from "next";
-import CircleCounterComponent from "@components/map/CircleCounterComponent";
+
+import CircleCounterComponent from "@components/map/MapTools/CircleCounterComponent";
 import Head from "next/head";
 import Header from "@components/header";
 import { useRouter } from "next/router";
@@ -113,7 +111,7 @@ export default function SharedCirclesPage() {
       // Add tile layer
       if (leafletLib.current && leafletMap.current) {
         const L = leafletLib.current;
-        
+
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           attribution:
             '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -155,41 +153,41 @@ export default function SharedCirclesPage() {
         if (insideCircles.length > 0) {
           // Dynamic import of polygon-clipping
           const pc = await import("polygon-clipping");
-          
+
           // Convert inside circles to polygons and find their intersection
-          const insidePolygons = insideCircles.map(c => 
+          const insidePolygons = insideCircles.map(c =>
             circleToPolygon(c.latitude, c.longitude, c.radius)
           );
-          
+
           // Start with first inside circle
           let searchArea: any = [[insidePolygons[0]]];
-          
+
           // Intersect with other inside circles
           for (let i = 1; i < insidePolygons.length; i++) {
             searchArea = pc.default.intersection(searchArea, [[insidePolygons[i]]]);
             if (searchArea.length === 0) break;
           }
-          
+
           // Subtract outside circles from search area
           if (searchArea.length > 0) {
             for (const outsideCircle of outsideCircles) {
               const outsidePoly = circleToPolygon(
-                outsideCircle.latitude, 
-                outsideCircle.longitude, 
+                outsideCircle.latitude,
+                outsideCircle.longitude,
                 outsideCircle.radius
               );
               searchArea = pc.default.difference(searchArea, [[outsidePoly]]);
               if (searchArea.length === 0) break;
             }
           }
-          
+
           // Draw the search area as green if it exists
           if (searchArea.length > 0) {
             searchArea.forEach((multiPolygon: any) => {
               const allRings = multiPolygon.map((ring: any) =>
                 ring.map(([lng, lat]: [number, number]) => [lat, lng])
               );
-              
+
               L.polygon(allRings, {
                 color: "#228B22",
                 fillColor: "#32CD32",
@@ -225,7 +223,7 @@ export default function SharedCirclesPage() {
 
   // Handle declining (just redirect away)
   const handleDecline = () => {
-    router.push("/circle");
+    router.push("/map");
   };
 
   // Check if user is the owner
@@ -266,8 +264,8 @@ export default function SharedCirclesPage() {
           <div className="error-box">
             <h2>⚠️ Error</h2>
             <p>{error}</p>
-            <button onClick={() => router.push("/circle")}>
-              Go to Circle Map
+            <button onClick={() => router.push("/map")}>
+              Go to Map
             </button>
           </div>
         </div>
@@ -351,10 +349,10 @@ export default function SharedCirclesPage() {
         {loggedInUser && !isOwner && (
           <div style={{ marginTop: "12px", borderTop: "1px solid #ddd", paddingTop: "12px" }}>
             {acceptSuccess ? (
-              <div className="bg-green-50 dark:bg-green-900/20" style={{ 
-                padding: "8px", 
+              <div className="bg-green-50 dark:bg-green-900/20" style={{
+                padding: "8px",
                 borderRadius: "6px",
-                marginBottom: "8px" 
+                marginBottom: "8px"
               }}>
                 <p className="text-green-700 dark:text-green-400" style={{ fontSize: "0.9em", fontWeight: 600 }}>
                   ✓ Circles accepted!
@@ -364,10 +362,10 @@ export default function SharedCirclesPage() {
                 </p>
               </div>
             ) : hasAccepted ? (
-              <div className="bg-blue-50 dark:bg-blue-900/20" style={{ 
-                padding: "8px", 
+              <div className="bg-blue-50 dark:bg-blue-900/20" style={{
+                padding: "8px",
                 borderRadius: "6px",
-                marginBottom: "8px" 
+                marginBottom: "8px"
               }}>
                 <p className="text-blue-700 dark:text-blue-400" style={{ fontSize: "0.9em", fontWeight: 600 }}>
                   ✓ Already accepted
@@ -461,7 +459,7 @@ export default function SharedCirclesPage() {
 
         {/* Go to map button */}
         <button
-          onClick={() => router.push("/circle")}
+          onClick={() => router.push("/map")}
           style={{
             marginTop: "12px",
             padding: "8px 16px",
@@ -497,8 +495,8 @@ export default function SharedCirclesPage() {
           <h3 className="text-gray-900 dark:text-gray-100" style={{ fontWeight: 600, marginBottom: "10px" }}>Circles</h3>
           <div style={{ maxHeight: "400px", overflowY: "auto" }}>
             {circles.map((circle, index) => (
-              <div 
-                key={circle.id} 
+              <div
+                key={circle.id}
                 className="bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600"
                 style={{
                   padding: "10px",
@@ -521,8 +519,8 @@ export default function SharedCirclesPage() {
                     <strong>Radius:</strong> {circle.radius}m
                   </p>
                   <p style={{ margin: "2px 0" }}>
-                    <strong>Type:</strong> 
-                    <span style={{ 
+                    <strong>Type:</strong>
+                    <span style={{
                       color: circle.isInside ? "green" : "darkgrey",
                       fontWeight: "bold",
                       marginLeft: "4px"
@@ -544,9 +542,9 @@ export default function SharedCirclesPage() {
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { GetStaticProps } from "next";
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-    return {
-        props: {
-            ...(await serverSideTranslations(locale ?? 'en', ['common'])),
-        },
-    };
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+    },
+  };
 };

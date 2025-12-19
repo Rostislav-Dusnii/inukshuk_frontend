@@ -90,6 +90,7 @@
     "loginHere": "Connectez-vous ici"
   },
   "map": {
+    "page_title": "Dessin de Cercles",
     "createCircle": "Créer un cercle",
     "createNewCircle": "Créer un nouveau cercle",
     "deleteCircle": "Supprimer le cercle",
@@ -279,7 +280,11 @@
     },
     "hints": {
       "title": "Paramètres des indices",
-      "add_new": { "1": "Ajouter", "2": "un", "3": "indice" },
+      "add_new": {
+        "1": "Ajouter",
+        "2": "un",
+        "3": "indice"
+      },
       "hint_title": "Titre",
       "hint_title_need1": "Le titre est requis",
       "hint_title_need2": "Le titre doit contenir au moins 3 caractères",

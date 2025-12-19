@@ -10,6 +10,10 @@ const languages = [
   { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "nl", name: "Nederlands", flag: "🇳🇱" },
+  { code: "dk", name: "Dansk", flag: "🇩🇰" },
 ];
 
 const LanguageSwitcher: React.FC = () => {
@@ -57,38 +61,35 @@ const LanguageSwitcher: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-sm hover:shadow-md h-[38px]"
+        className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95 transition-all shadow-sm hover:shadow-md h-[38px] focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 border-0"
+        style={{ background: undefined, border: 'none', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
         aria-label="Select language"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >
-        <Globe className="w-4 h-4 text-brand-orange" />
+        <Globe className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         <span className="hidden sm:inline">{currentLanguage.flag}</span>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 animate-scaleIn">
-          <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">
-            {t("language.select")}
-          </div>
-          <ul role="listbox" className="py-1">
+        <div className="absolute right-0 mt-2 w-auto min-w-[180px] rounded-xl bg-white dark:bg-gray-900 shadow-xl shadow-black/10 dark:shadow-black/30 border border-gray-200 dark:border-gray-700/50 overflow-hidden z-50 animate-scaleIn">
+          <ul role="listbox" className="p-3 grid grid-cols-3 gap-2.5">
             {languages.map((language) => (
               <li key={language.code}>
                 <button
                   onClick={() => changeLanguage(language.code)}
-                  className={`w-full flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                  className={`w-full flex flex-col items-center gap-1.5 px-4 py-3 text-xs font-medium rounded-lg transition-all duration-150 focus:outline-none border-0 ${
                     currentLanguage.code === language.code
-                      ? "bg-brand-orange/10 text-brand-orange dark:text-brand-orange-light font-medium"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white"
+                      : "bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                   }`}
+                  style={{ background: currentLanguage.code === language.code ? undefined : 'transparent', border: 'none', boxShadow: 'none' }}
                   role="option"
                   aria-selected={currentLanguage.code === language.code}
+                  title={language.name}
                 >
-                  <span className="text-lg">{language.flag}</span>
-                  <span>{language.name}</span>
-                  {currentLanguage.code === language.code && (
-                    <span className="ml-auto text-brand-orange">✓</span>
-                  )}
+                  <span className="text-2xl">{language.flag}</span>
+                  <span className="uppercase text-[10px]">{language.code}</span>
                 </button>
               </li>
             ))}
