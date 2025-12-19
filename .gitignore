@@ -39,5 +39,3 @@ cypress/videos
 cypress/reports
 
 .idea
-
-package-lock.json
