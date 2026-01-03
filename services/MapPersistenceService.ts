@@ -116,12 +116,12 @@ export const loadMapData = async (
         maxId = Math.max(maxId, id || 0);
 
         if (type === "circle") {
-            // Recreate circle
+            // Recreate circle with invisible fill (unified fill layer handles visible fill)
             const [lng, lat] = feature.geometry.coordinates;
             const circle = L.circle([lat, lng], {
                 color: inside ? "green" : "darkgrey",
-                fillColor: inside ? "lightgreen" : "lightgrey",
-                fillOpacity: 0.4,
+                weight: 2,
+                fillOpacity: 0,
                 radius: radius,
             });
 

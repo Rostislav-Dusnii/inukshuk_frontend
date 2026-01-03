@@ -15,10 +15,11 @@ import AcceptedCirclesPanel from "@components/map/AcceptedCirclesPanel";
 import CircleService from "@services/CircleService";
 import SaveServiceManager from "@util/save";
 import Header from "@components/header";
-import { compareShapesForIntersections } from "@util/polygonCalculations";
+import { compareShapesForIntersections, circleToPolygon } from "@util/polygonCalculations";
 import { saveMapData as saveMapDataUtil, loadMapData as loadMapDataUtil } from "@services/MapPersistenceService";
 import { updateCircleInside as updateCircleInsideHelper, toggleCircleVisibility as toggleCircleVisibilityHelper, zoomToShape, calculateZoomForRadius } from "@util/circleHelpers";
 import { useTranslation } from "next-i18next";
+import * as pc from "polygon-clipping";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LeafletMap = any;
@@ -63,6 +64,10 @@ export default function MapClientPage() {
     const [acceptedCircles, setAcceptedCircles] = useState<any[]>([]);
     const [acceptedCircleShapes, setAcceptedCircleShapes] = useState<Map<string, any[]>>(new Map());
     const [acceptedCirclesRefresh, setAcceptedCirclesRefresh] = useState(0);
+
+    // Unified fill layers to prevent opacity stacking
+    const unifiedInsideFillRef = useRef<any>(null);
+    const unifiedOutsideFillRef = useRef<any>(null);
 
     // Load logged in user and check authentication
     useEffect(() => {
@@ -206,8 +211,90 @@ export default function MapClientPage() {
         );
     };
 
+    // Update unified fill layers to prevent opacity stacking when circles overlap
+    const updateUnifiedFillLayers = () => {
+        const L = mapContainerRef.current?.getLeafletLib();
+        const leafletMap = mapContainerRef.current?.getMap();
+        if (!L || !leafletMap) return;
+
+        // Remove existing unified fill layers
+        if (unifiedInsideFillRef.current) {
+            leafletMap.removeLayer(unifiedInsideFillRef.current);
+            unifiedInsideFillRef.current = null;
+        }
+        if (unifiedOutsideFillRef.current) {
+            leafletMap.removeLayer(unifiedOutsideFillRef.current);
+            unifiedOutsideFillRef.current = null;
+        }
+
+        // Separate visible circles by inside/outside status
+        const visibleCircles = circles.filter(c => c.visible !== false);
+        const insideCircles = visibleCircles.filter(c => c.inside);
+        const outsideCircles = visibleCircles.filter(c => !c.inside);
+
+        // Create unified fill for "inside" circles (green)
+        if (insideCircles.length > 0) {
+            try {
+                const insidePolygons = insideCircles.map(c => [circleToPolygon(c.shape)]);
+                let unifiedInside = insidePolygons[0];
+                for (let i = 1; i < insidePolygons.length; i++) {
+                    unifiedInside = pc.union(unifiedInside as pc.Geom, insidePolygons[i] as pc.Geom);
+                }
+
+                // Convert to Leaflet polygon format and add to map
+                const insideCoords = (unifiedInside as any).map((poly: any) =>
+                    poly.map((ring: any) => ring.map(([lng, lat]: [number, number]) => [lat, lng]))
+                );
+                unifiedInsideFillRef.current = L.polygon(insideCoords, {
+                    color: "transparent",
+                    fillColor: "lightgreen",
+                    fillOpacity: 0.4,
+                    interactive: false,
+                }).addTo(leafletMap);
+                // Send to back so stroke circles are on top for interaction
+                unifiedInsideFillRef.current.bringToBack();
+            } catch (e) {
+                console.error("Error creating unified inside fill:", e);
+            }
+        }
+
+        // Create unified fill for "outside" circles (grey)
+        if (outsideCircles.length > 0) {
+            try {
+                const outsidePolygons = outsideCircles.map(c => [circleToPolygon(c.shape)]);
+                let unifiedOutside = outsidePolygons[0];
+                for (let i = 1; i < outsidePolygons.length; i++) {
+                    unifiedOutside = pc.union(unifiedOutside as pc.Geom, outsidePolygons[i] as pc.Geom);
+                }
+
+                // Convert to Leaflet polygon format and add to map
+                const outsideCoords = (unifiedOutside as any).map((poly: any) =>
+                    poly.map((ring: any) => ring.map(([lng, lat]: [number, number]) => [lat, lng]))
+                );
+                unifiedOutsideFillRef.current = L.polygon(outsideCoords, {
+                    color: "transparent",
+                    fillColor: "lightgrey",
+                    fillOpacity: 0.4,
+                    interactive: false,
+                }).addTo(leafletMap);
+                // Send to back so stroke circles are on top for interaction
+                unifiedOutsideFillRef.current.bringToBack();
+            } catch (e) {
+                console.error("Error creating unified outside fill:", e);
+            }
+        }
+    };
+
     useEffect(compareArrays, [circles]);
     // Note: intersections is intentionally not in deps to avoid infinite loop
+
+    // Update unified fill layers when circles change
+    useEffect(() => {
+        if (mapReady) {
+            updateUnifiedFillLayers();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [circles, mapReady]);
 
     const defaultValues = {
         Latitude: 50.8466429249097,
@@ -356,11 +443,12 @@ export default function MapClientPage() {
 
         const id = nextId + 1;
 
-        // Maak de nieuwe cirkel met de correcte kleur en radius
+        // Create circle with invisible fill (fillOpacity: 0) - the unified fill layer handles the visible fill
+        // to prevent opacity stacking when circles overlap. Keep fill for click interaction.
         const newCircle = L.circle([latToUse, lngToUse], {
             color: isInside ? "green" : "darkgrey",
-            fillColor: isInside ? "lightgreen" : "lightgrey",
-            fillOpacity: 0.4,
+            weight: 2,
+            fillOpacity: 0,
             radius: radius,
         }).addTo(leafletMap);
 

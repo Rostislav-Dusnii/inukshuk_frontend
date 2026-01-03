@@ -23,10 +23,9 @@ export const updateCircleInside = (
         setCircles((prev) => {
             return prev.map((circleObj) => {
                 if (circleObj.id === circleId) {
-                    // Update the Leaflet circle style
+                    // Update the Leaflet circle stroke color (no fill - unified layer handles fill)
                     circleObj.shape.setStyle({
                         color: newInsideValue ? "green" : "darkgrey",
-                        fillColor: newInsideValue ? "lightgreen" : "lightgrey",
                     });
                     // Return new object with updated inside value
                     return { ...circleObj, inside: newInsideValue };
@@ -136,16 +135,16 @@ export const calculateZoomForRadius = (radiusInMeters: number): number => {
     // Approximate meters per pixel at zoom level 0 at the equator
     // At zoom 0, the world is 256 pixels wide, Earth's circumference is ~40,075,000 meters
     const metersPerPixelAtZoom0 = 40075000 / 256;
-    
+
     // We want the circle diameter to take up about 60% of the viewport width
     // Assuming a typical viewport width of ~800 pixels, that's ~480 pixels for the diameter
     const desiredDiameterInPixels = 400;
     const diameterInMeters = radiusInMeters * 2;
-    
+
     // Calculate zoom level: metersPerPixel = metersPerPixelAtZoom0 / (2^zoom)
     // Therefore: zoom = log2(metersPerPixelAtZoom0 * desiredDiameterInPixels / diameterInMeters)
     const zoom = Math.log2((metersPerPixelAtZoom0 * desiredDiameterInPixels) / diameterInMeters);
-    
+
     // Clamp zoom between reasonable bounds (1-19)
     return Math.max(1, Math.min(19, Math.round(zoom)));
 };
